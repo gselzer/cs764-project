@@ -1,4 +1,7 @@
 #include "Scan.h"
+#include "Record.h"
+
+#include<cstdlib>
 
 ScanPlan::ScanPlan (RowCount const count) : _count (count)
 {
@@ -20,6 +23,9 @@ ScanIterator::ScanIterator (ScanPlan const * const plan) :
 	_plan (plan), _count (0)
 {
 	TRACE (true);
+	// TODO: Consider random initialization
+	// srand((unsigned) time(NULL));
+
 } // ScanIterator::ScanIterator
 
 ScanIterator::~ScanIterator ()
@@ -36,6 +42,8 @@ bool ScanIterator::next ()
 
 	if (_count >= _plan->_count)
 		return false;
+
+	Record * r = new Record(rand());
 
 	++ _count;
 	return true;
