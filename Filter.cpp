@@ -1,5 +1,7 @@
 #include "Filter.h"
 
+#include<cstdlib>
+
 FilterPlan::FilterPlan (Plan * const input) : _input (input)
 {
 	TRACE (true);
@@ -35,16 +37,18 @@ FilterIterator::~FilterIterator ()
 			(unsigned long) (_consumed));
 } // FilterIterator::~FilterIterator
 
-bool FilterIterator::next ()
+Record* FilterIterator::next ()
 {
 	TRACE (true);
-
+	Record *r;
 	do
 	{
-		if ( ! _input->next ())  return false;
+		r = _input->next();
+		if (!r)  return NULL;
 		++ _consumed;
+		if (_consumed % 2 != 0) free(r);
 	} while (_consumed % 2 == 0);
 
 	++ _produced;
-	return true;
+	return r;
 } // FilterIterator::next

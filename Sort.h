@@ -16,7 +16,7 @@ class SortIterator : public Iterator
 public:
 	SortIterator (SortPlan const * const plan);
 	~SortIterator ();
-	bool next ();
+	Record* next ();
 private:
 	SortPlan const * const _plan;
 	Iterator * const _input;

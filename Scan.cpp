@@ -1,5 +1,4 @@
 #include "Scan.h"
-#include "Record.h"
 
 #include<cstdlib>
 
@@ -36,15 +35,13 @@ ScanIterator::~ScanIterator ()
 			(unsigned long) (_plan->_count));
 } // ScanIterator::~ScanIterator
 
-bool ScanIterator::next ()
+Record* ScanIterator::next ()
 {
 	TRACE (true);
 
 	if (_count >= _plan->_count)
-		return false;
+		return NULL;
+	_count++;
 
-	Record * r = new Record(rand());
-
-	++ _count;
-	return true;
+	return new Record(rand());
 } // ScanIterator::next

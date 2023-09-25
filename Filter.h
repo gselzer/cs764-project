@@ -16,7 +16,7 @@ class FilterIterator : public Iterator
 public:
 	FilterIterator (FilterPlan const * const plan);
 	~FilterIterator ();
-	bool next ();
+	Record* next ();
 private:
 	FilterPlan const * const _plan;
 	Iterator * const _input;

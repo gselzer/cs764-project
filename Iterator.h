@@ -1,6 +1,7 @@
 #pragma once
 
 #include "defs.h"
+#include "Record.h"
 
 typedef uint64_t RowCount;
 
@@ -20,7 +21,7 @@ public:
 	Iterator ();
 	virtual ~Iterator ();
 	void run ();
-	virtual bool next () = 0;
+	virtual Record* next () = 0;
 private:
 	RowCount _count;
 }; // class Iterator

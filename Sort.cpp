@@ -1,4 +1,5 @@
 #include "Sort.h"
+#include <cstdlib>
 
 SortPlan::SortPlan (Plan * const input) : _input (input)
 {
@@ -23,7 +24,13 @@ SortIterator::SortIterator (SortPlan const * const plan) :
 {
 	TRACE (true);
 
-	while (_input->next ())  ++ _consumed;
+	Record *r = _input->next();
+	while (r) {
+		// TODO
+		++ _consumed;
+		free(r);
+		r = _input->next();
+	}  
 	delete _input;
 
 	traceprintf ("consumed %lu rows\n",
@@ -39,12 +46,13 @@ SortIterator::~SortIterator ()
 			(unsigned long) (_consumed));
 } // SortIterator::~SortIterator
 
-bool SortIterator::next ()
+Record* SortIterator::next ()
 {
 	TRACE (true);
 
-	if (_produced >= _consumed)  return false;
+	if (_produced >= _consumed)  return NULL;
 
 	++ _produced;
-	return true;
+	// TODO
+	return NULL;
 } // SortIterator::next
