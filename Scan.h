@@ -1,4 +1,5 @@
 #include "Iterator.h"
+#include "Record.h"
 
 class ScanPlan : public Plan
 {
@@ -20,4 +21,5 @@ public:
 private:
 	ScanPlan const * const _plan;
 	RowCount _count;
+	Record* _currentRecord;  //  New Variable for current record
 }; // class ScanIterator
