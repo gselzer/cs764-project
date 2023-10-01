@@ -1,22 +1,20 @@
+# Compiler options
 CPPOPT=-g -Og -D_DEBUG
-# -O2 -Os -Ofast
-# -fprofile-generate -fprofile-use
-CPPFLAGS=$(CPPOPT) -Wall -ansi -pedantic
-# -Wparentheses -Wno-unused-parameter -Wformat-security
-# -fno-rtti -std=c++11 -std=c++98
+CPPFLAGS=$(CPPOPT) -Wall -ansi -pedantic -Iinclude -std=c++11
 
 # documents and scripts
 DOCS=Tasks.txt
 SCRS=
 
-# headers and code sources
-HDRS=	defs.h \
-		Iterator.h Scan.h Filter.h Sort.h Record.h
-SRCS=	defs.cpp Assert.cpp Test.cpp \
-		Iterator.cpp Scan.cpp Filter.cpp Sort.cpp Record.cpp
+# headers and code sources with updated paths
+HDRS=	include/defs.h \
+		include/Iterator.h include/Scan.h include/Filter.h include/Sort.h include/Record.h
+
+SRCS=	src/defs.cpp src/Assert.cpp src/Test.cpp src/TestMain.cpp \
+		src/Iterator.cpp src/Scan.cpp src/Filter.cpp src/Sort.cpp src/Record.cpp
 
 # compilation targets
-OBJS=	defs.o Assert.o Test.o \
+OBJS=	defs.o Assert.o Test.o TestMain.o \
 		Iterator.o Scan.o Filter.o Sort.o Record.o
 
 # RCS assists
@@ -24,22 +22,28 @@ REV=-q -f
 MSG=no message
 
 # default target
-#
 Test.exe : Makefile $(OBJS)
 	g++ $(CPPFLAGS) -o Test.exe $(OBJS)
+
+# New target for unit testing
+
+test_program: TestMain.o $(filter-out Test.o, $(OBJS))
+	g++ $(CPPFLAGS) -o test_program TestMain.o $(filter-out Test.o, $(OBJS))
+
 
 trace : Test.exe Makefile
 	@date > trace
 	./Test.exe >> trace
 	@size -t Test.exe $(OBJS) | sort -r >> trace
 
-$(OBJS) : Makefile defs.h
-Test.o : Iterator.h Scan.h Filter.h Sort.h
-Iterator.o Scan.o Filter.o Sort.o : Iterator.h
-Scan.o : Scan.h
-Filter.o : Filter.h
-Sort.o : Sort.h
-Record.o : Record.h
+$(OBJS) : Makefile include/defs.h
+Test.o : include/Iterator.h include/Scan.h include/Filter.h include/Sort.h include/Record.h
+Iterator.o Scan.o Filter.o Sort.o : include/Iterator.h
+Scan.o : include/Scan.h
+Filter.o : include/Filter.h
+Sort.o : include/Sort.h
+Record.o : include/Record.h
+TestMain.o : include/Iterator.h include/Scan.h include/Filter.h include/Sort.h include/Record.h
 
 list : Makefile
 	echo Makefile $(HDRS) $(SRCS) $(DOCS) $(SCRS) > list

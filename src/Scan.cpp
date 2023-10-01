@@ -1,5 +1,4 @@
 #include "Scan.h"
-
 #include<cstdlib>
 
 ScanPlan::ScanPlan (RowCount const count) : _count (count)
@@ -38,10 +37,7 @@ ScanIterator::~ScanIterator ()
 Record* ScanIterator::next ()
 {
 	TRACE (true);
-
-	if (_count >= _plan->_count)
-		return NULL;
-	_count++;
-
-	return new Record(rand());
+	int random_key = rand() % 100;
+    int random_value = rand() % 100;
+    return new Record(random_key, random_value); // Returning the Scanned record
 } // ScanIterator::next

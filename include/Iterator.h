@@ -1,5 +1,4 @@
 #pragma once
-
 #include "defs.h"
 #include "Record.h"
 
@@ -16,11 +15,16 @@ private:
 }; // class Plan
 
 
+
+
 class Iterator
 {
 public:
 	Iterator ();
 	virtual ~Iterator ();
+
+	//Do we need the above 2 lines?
+
 	void run ();
 	virtual Record* next () = 0;
 private:
