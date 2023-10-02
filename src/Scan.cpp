@@ -36,8 +36,12 @@ ScanIterator::~ScanIterator ()
 
 Record* ScanIterator::next ()
 {
-	TRACE (true);
-	int random_key = rand() % 100;
+    TRACE (true);
+    if (_count >= _plan->_count) {
+        return new Record(-1, -1); // Stopping condition
+    }
+    int random_key = rand() % 100;
     int random_value = rand() % 100;
-    return new Record(random_key, random_value); // Returning the Scanned record
-} // ScanIterator::next
+    _count++;
+    return new Record(random_key, random_value);
+}// ScanIterator::next

@@ -90,6 +90,6 @@ Record* SortIterator::next() {
     if (_currentIdx < _sortedRecords.size()) {
         return _sortedRecords[_currentIdx++];
     } else {
-        return new Record(-1, -1);
+        return new Record(-1, -1); // Stopping condition
     }
 }
