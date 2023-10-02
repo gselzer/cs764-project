@@ -1,4 +1,6 @@
+
 #include "Iterator.h"
+#include "Record.h"
 
 class ScanPlan : public Plan
 {
@@ -16,7 +18,7 @@ class ScanIterator : public Iterator
 public:
 	ScanIterator (ScanPlan const * const plan);
 	~ScanIterator ();
-	Record* next ();
+	Record* next() override; // modified to return Record
 private:
 	ScanPlan const * const _plan;
 	RowCount _count;
