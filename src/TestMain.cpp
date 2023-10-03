@@ -2,6 +2,7 @@
 #include "../include/Scan.h"
 #include "../include/Filter.h"
 #include "../include/Sort.h"
+#include "../include/VerifyOrder.h"
 #include <iostream>
 #include <cassert>
 #include <vector>
@@ -15,11 +16,11 @@ void testScanIterator() {
     int count = 0;
     while (true) {
         Record* record = scanIt->next();
-        if (record->key == -1) {  // Assuming -1 indicates the end
+        if (record->row1 == -1) {  // Assuming -1 indicates the end
             break;
         }
         // Replace with your actual validation logic
-        assert(record->key >= 0 && record->value >= 0);
+        assert(record->row1 >= 0 && record->row2 >= 0);
         ++count;
     }
     assert(count == 10);  // Assuming we generated 10 records
@@ -34,37 +35,25 @@ void testSortIterator() {
     
     // Manually creating some records for testing
     int noRecords = 100;
-    std::vector<Record*> records;
-    // for (int i = 0; i < noRecords; i++) {
-    //     records.push_back(new Record(rand(), i));
-    // }
 
     // Assuming SortPlan takes another Plan as input
     ScanPlan scanPlan(noRecords);  // Just a placeholder; replace with your actual input plan
     SortPlan sortPlan(&scanPlan);
+    VerifyOrderPlan verifyPlan(&sortPlan);
 
     // Initialize SortIterator
-    Iterator* sortIt = sortPlan.init();
-    // dynamic_cast<SortIterator*>(sortIt)->sort(records);
+    Iterator* sortIt = verifyPlan.init();
     
-    int lastKey = -1;
     while (true) {
         Record* record = sortIt->next();
-        if (record->key == -1) {
+        int val = record->row1;
+        std::cout << val << "\n";
+        delete record;
+        if (val == -1) {
             break;
         }
-        
-        // Validate that records are sorted by key
-        std::cout << record->key << "\n";
-        assert(record->key >= lastKey);
-        lastKey = record->key;
-        records.push_back(record);
     }
     
-    // Clean up
-    for (Record* record : records) {
-        delete record;
-    }
     // delete sortIt;
     
     std::cout << "SortIterator tests passed.\n";
