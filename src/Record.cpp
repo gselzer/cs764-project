@@ -1,6 +1,6 @@
 #include "Record.h"
 // Constructor
-Record::Record(int k, int v) : key(k), value(v) {
+Record::Record(int r1, int r2, int r3) : row1(r1), row2(r2), row3(r3) {
 	TRACE(true);
 }// ScanPlan::ScanPlan
 

@@ -18,7 +18,7 @@ void merge(std::vector<Record*>& records, int l, int m, int r) {
     int k = l;
 
     while (i < n1 && j < n2) {
-        if (L[i]->key <= R[j]->key) {
+        if (L[i]->row1 <= R[j]->row1) {
             records[k] = L[i];
             i++;
         }
@@ -71,7 +71,7 @@ SortIterator::SortIterator(const SortPlan* plan)
 {
     std::vector<Record*> records;
     Record* record = _input->next();
-    while (record->key != -1) {
+    while (record->row1 != -1) {
         records.push_back(record);
         record = _input->next();
     }
@@ -90,6 +90,6 @@ Record* SortIterator::next() {
     if (_currentIdx < _sortedRecords.size()) {
         return _sortedRecords[_currentIdx++];
     } else {
-        return new Record(-1, -1); // Stopping condition
+        return new Record(-1, -1, -1); // Stopping condition
     }
 }

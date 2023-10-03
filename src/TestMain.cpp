@@ -33,18 +33,19 @@ void testSortIterator() {
     std::cout << "Running SortIterator tests...\n";
     
     // Manually creating some records for testing
+    int noRecords = 100;
     std::vector<Record*> records;
-    records.push_back(new Record(3, 30));
-    records.push_back(new Record(1, 10));
-    records.push_back(new Record(2, 20));
+    // for (int i = 0; i < noRecords; i++) {
+    //     records.push_back(new Record(rand(), i));
+    // }
 
     // Assuming SortPlan takes another Plan as input
-    ScanPlan scanPlan(3);  // Just a placeholder; replace with your actual input plan
+    ScanPlan scanPlan(noRecords);  // Just a placeholder; replace with your actual input plan
     SortPlan sortPlan(&scanPlan);
 
     // Initialize SortIterator
     Iterator* sortIt = sortPlan.init();
-    dynamic_cast<SortIterator*>(sortIt)->sort(records);
+    // dynamic_cast<SortIterator*>(sortIt)->sort(records);
     
     int lastKey = -1;
     while (true) {
@@ -54,15 +55,17 @@ void testSortIterator() {
         }
         
         // Validate that records are sorted by key
+        std::cout << record->key << "\n";
         assert(record->key >= lastKey);
         lastKey = record->key;
+        records.push_back(record);
     }
     
     // Clean up
     for (Record* record : records) {
         delete record;
     }
-    delete sortIt;
+    // delete sortIt;
     
     std::cout << "SortIterator tests passed.\n";
 }
