@@ -18,7 +18,7 @@ void merge(std::vector<Record*>& records, int l, int m, int r) {
     int k = l;
 
     while (i < n1 && j < n2) {
-        if (L[i]->row1 <= R[j]->row1) {
+        if (L[i] <= R[j]) {
             records[k] = L[i];
             i++;
         }

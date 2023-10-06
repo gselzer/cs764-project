@@ -2,6 +2,7 @@
 #include<cassert>
 #include<cstdlib>
 #include<limits>
+#include<iostream>
 
 VerifyOrderPlan::VerifyOrderPlan (Plan *const input) : _input (input)
 {

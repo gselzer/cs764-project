@@ -46,7 +46,7 @@ void testSortIterator() {
     
     while (true) {
         Record* record = sortIt->next();
-        if (!record) {
+        if (record != nullptr) {
             break;
         }
         std::cout << record->row1 << "\n";
