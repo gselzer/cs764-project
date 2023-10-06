@@ -44,7 +44,7 @@ Record* FilterIterator::next ()
 	do
 	{
 		r = _input->next();
-		if (!r)  return NULL;
+		if (r == nullptr)  return NULL;
 		++ _consumed;
 		if (_consumed % 2 != 0) free(r);
 	} while (_consumed % 2 == 0);

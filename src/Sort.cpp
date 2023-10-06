@@ -71,7 +71,7 @@ SortIterator::SortIterator(const SortPlan* plan)
 {
     std::vector<Record*> records;
     Record* record = _input->next();
-    while (record->row1 != -1) {
+    while (record != nullptr) {
         records.push_back(record);
         record = _input->next();
     }
@@ -90,6 +90,6 @@ Record* SortIterator::next() {
     if (_currentIdx < _sortedRecords.size()) {
         return _sortedRecords[_currentIdx++];
     } else {
-        return new Record(-1, -1, -1); // Stopping condition
+        return nullptr;
     }
 }

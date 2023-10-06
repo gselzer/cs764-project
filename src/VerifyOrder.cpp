@@ -40,8 +40,7 @@ Record* VerifyOrderIterator::next ()
 {
     TRACE (true);
 	Record *r = _input->next();
-	// TODO: Should really just return nulls when out of records
-	if (r->row1 > -1) {
+	if (r != nullptr) {
 		assert(r->row1 >= _lastValue);
 		_lastValue = r->row1;
 	}

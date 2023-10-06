@@ -16,7 +16,7 @@ void testScanIterator() {
     int count = 0;
     while (true) {
         Record* record = scanIt->next();
-        if (record->row1 == -1) {  // Assuming -1 indicates the end
+        if (!record) {  // Assuming -1 indicates the end
             break;
         }
         // Replace with your actual validation logic
@@ -46,12 +46,11 @@ void testSortIterator() {
     
     while (true) {
         Record* record = sortIt->next();
-        int val = record->row1;
-        std::cout << val << "\n";
-        delete record;
-        if (val == -1) {
+        if (!record) {
             break;
         }
+        std::cout << record->row1 << "\n";
+        delete record;
     }
     
     // delete sortIt;
