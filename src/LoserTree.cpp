@@ -12,6 +12,17 @@ LoserTree::~LoserTree() {
     free(_tree);
 }
 
+Record *LoserTree::next() {
+    // The next record is the 
+    Record next = _runs[_tree[0]];
+
+    return &next;
+}
+
+void LoserTree::replayGame(int idx) {
+    
+}
+
 void LoserTree::buildTree() {
     int* _tmp = (int*) malloc(_runCount * sizeof(int));
     for(int i = 0; i < _runCount; i++) {
@@ -43,4 +54,39 @@ void LoserTree::buildTree() {
 
     std::cout << "Index " << _tmp[0] << " won!\n";
     free(_tmp);
+}
+
+Run::Run(int size) : _size(size), _idx(0) {
+    // Allocate Record array
+    _r = (Record *)malloc(_size * sizeof(Record));
+    // Populate Record array
+    int start = rand() % 5;
+    for(int i = 0; i < _size; i++) {
+        _r[i].row1 = start;
+        _r[i].row2 = start;
+        _r[i].row3 = start;
+        start += rand() % 5;
+    }
+
+    // "Print" Record array
+    std::cout << "Run data: ";
+    for(int i = 0; i < _size; i++) {
+        std::cout << _r[i].row1 << ", ";
+    }
+    std::cout << "\n";
+}
+
+Record *Run::peek() {
+    return _r + _idx;
+}
+
+Record *Run::pop() {
+    if (_idx < _size) {
+        return _r + _idx++;
+    }
+    return nullptr;
+}
+
+Run::~Run() {
+    free(_r);
 }

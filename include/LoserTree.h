@@ -7,9 +7,10 @@ class LoserTree
 public:
     LoserTree(Record runs[], int runCount);
     ~LoserTree();
-    // Record* next();
+    Record* next();
 private:
     void buildTree();
+    void replayGame(int idx);
     int _runCount;
     int* _tree;
     Record* _runs;
@@ -19,11 +20,12 @@ private:
 
 class Run {
 public:
-    Run(int idx);
+    Run(int size);
     ~Run();
     Record* peek();
-    // Record* pop();
+    Record* pop();
 private:
+    int _size;
     int _idx;
     Record *_r;
 }; // class Run

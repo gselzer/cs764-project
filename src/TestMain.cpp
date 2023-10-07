@@ -71,10 +71,30 @@ void testLoserTree() {
     delete l;
 }
 
+void testRun() {
+    int numRecords = 10;
+    Run * r = new Run(numRecords);
+
+    // Assert multiple calls of peek return same type
+    assert(r->peek() == r->peek());
+
+    // Assert pop returns new values until end
+    int lastValue = -1;
+    for(int i = 0; i < numRecords; i++) {
+        Record *rec = r->pop();
+        assert (rec->row1 >= lastValue);
+        lastValue = rec->row1;
+    }
+    assert (r->pop() == nullptr);
+
+    delete r;
+}
+
 int main() {
     // testScanIterator();
     // testSortIterator();
-    testLoserTree();
+    // testLoserTree();
+    testRun();
     
     std::cout << "All unit tests passed.\n";
     return 0;
