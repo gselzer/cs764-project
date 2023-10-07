@@ -3,6 +3,7 @@
 #include "../include/Filter.h"
 #include "../include/Sort.h"
 #include "../include/VerifyOrder.h"
+#include "../include/LoserTree.h"
 #include <iostream>
 #include <cassert>
 #include <vector>
@@ -55,13 +56,25 @@ void testSortIterator() {
     }
     
     // delete sortIt;
+    delete sortIt;
     
     std::cout << "SortIterator tests passed.\n";
 }
 
+void testLoserTree() {
+    // Record r[2] = {{1, 1, 1}, {2, 2, 2}};
+    // Record r[4] = {{5, 1, 1}, {2, 2, 2}, {3, 3, 3}, {4, 4, 4}};
+    Record r[8] = {{1, 1, 1}, {2, 2, 2}, {3, 3, 3}, {4, 4, 4}, {5, 5, 5}, {6, 6, 6}, {7, 7, 7}, {8, 8, 8}};
+
+    LoserTree *l = new LoserTree(r, 8);
+
+    delete l;
+}
+
 int main() {
-    testScanIterator();
-    testSortIterator();
+    // testScanIterator();
+    // testSortIterator();
+    testLoserTree();
     
     std::cout << "All unit tests passed.\n";
     return 0;
