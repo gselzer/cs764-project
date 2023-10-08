@@ -2,22 +2,6 @@
 #include "defs.h"
 #include "Record.h"
 
-class LoserTree
-{
-public:
-    LoserTree(Record runs[], int runCount);
-    ~LoserTree();
-    Record* next();
-private:
-    void buildTree();
-    void replayGame(int idx);
-    int _runCount;
-    int* _tree;
-    Record* _runs;
-}; // class LoserTree
-
-
-
 class Run {
 public:
     Run(int size);
@@ -29,3 +13,18 @@ private:
     int _idx;
     Record *_r;
 }; // class Run
+
+class LoserTree
+{
+public:
+    LoserTree(Run runs[], int runCount);
+    ~LoserTree();
+    Record* next();
+private:
+    void buildTree();
+    void replayGame(int idx, int prevWinner);
+    void printTree();
+    int _runCount;
+    int* _tree;
+    Run* _runs;
+}; // class LoserTree

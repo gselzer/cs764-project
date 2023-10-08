@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <iostream>
 
-LoserTree::LoserTree(Record runs[], int runCount) : _runs(runs), _runCount(runCount){
+LoserTree::LoserTree(Run runs[], int runCount) : _runs(runs), _runCount(runCount){
     _tree = (int*) malloc(runCount * sizeof(int));
     buildTree();
 };
@@ -13,27 +13,65 @@ LoserTree::~LoserTree() {
 }
 
 Record *LoserTree::next() {
-    // The next record is the 
-    Record next = _runs[_tree[0]];
-
-    return &next;
+    // Grab the overall winner
+    int winner = _tree[0];
+    Record* r = _runs[winner].pop();
+    // Determine the leaf node corresponding to winner's first comparison
+    int startIdx = (_runCount + _tree[0]) / 2;
+    // Replay the games from that tree leaf to root
+    replayGame(startIdx, winner);
+    // Return winner
+    return r;
 }
 
-void LoserTree::replayGame(int idx) {
-    
+void LoserTree::replayGame(int idx, int prevWinner) {
+    // Idx is 0 - all we have to do is assign the winner
+    if (idx == 0) {
+        _tree[idx] = prevWinner;
+        // printTree();
+        return;
+    }
+    // Otherwise, we need to do a comparison to determine
+    // which run stays here (i.e. the lower) and which run
+    // moves to the parent node (i.e. the winner)
+    int prevLoser = _tree[idx];
+    int winner = -1, loser = -1;
+    Record *rl = _runs[prevLoser].peek();
+    Record *rw = _runs[prevWinner].peek();
+    if (rl == nullptr) {
+        // std::cout << "Index " << prevLoser << " is out of records - " <<  prevWinner << " wins \n";
+        winner = prevWinner;
+        loser = prevLoser;
+    } else if (rw == nullptr) {
+        // std::cout << "Index " << prevWinner << " is out of records - " <<  prevLoser << " wins \n";
+        winner = prevLoser;
+        loser = prevWinner;
+    } else if (*rl <= *rw) {
+        // std::cout << "Index " << prevLoser << " beat out Index " <<  prevWinner << "\n";
+        winner = prevLoser;
+        loser = prevWinner;
+
+    } else {
+        // std::cout << "Index " << prevWinner << " beat out Index " <<  prevLoser << "\n";
+        winner = prevWinner;
+        loser = prevLoser;
+    }
+
+    _tree[idx] = loser;
+    replayGame(idx / 2, winner);
 }
 
 void LoserTree::buildTree() {
+    std::cout << "Building Tree...\n";
     int* _tmp = (int*) malloc(_runCount * sizeof(int));
     for(int i = 0; i < _runCount; i++) {
         _tmp[i] = i;
     }
     for (int half = _runCount / 2; half >= 1; half /= 2) {
-        std::cout << half << "\n";
         for(int i = 0; i < half; i++) {
             int idx1 = _tmp[2 * i];
             int idx2 = _tmp[2 * i + 1];
-            if (_runs[idx1] <= _runs[idx2]) {
+            if (*(_runs[idx1].peek()) <= *(_runs[idx2].peek())) {
                 std::cout << "Index " << idx1 << " beat out Index " << idx2 << "\n";
                 _tree[half + i] = idx2;
                 _tmp[i] = idx1;
@@ -46,14 +84,20 @@ void LoserTree::buildTree() {
         }
     }
     _tree[0] = _tmp[0];
-    std::cout << "Initial Tree: [";
+    printTree();
+
+    free(_tmp);
+}
+
+void LoserTree::printTree(){ 
+    // Idx 0 is the "overall winner",
+    // Idx 1 is the "root node" of the tree,
+    // for Idx i>0, its children are located at (2i) and (2i+1)
+    std::cout << "Tree: [";
     for (int i = 0; i < _runCount; i++) {
         std::cout << _tree[i] << ",";
     }
-    std::cout << "]";
-
-    std::cout << "Index " << _tmp[0] << " won!\n";
-    free(_tmp);
+    std::cout << "]\n";
 }
 
 Run::Run(int size) : _size(size), _idx(0) {

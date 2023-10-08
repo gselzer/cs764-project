@@ -64,9 +64,15 @@ void testSortIterator() {
 void testLoserTree() {
     // Record r[2] = {{1, 1, 1}, {2, 2, 2}};
     // Record r[4] = {{5, 1, 1}, {2, 2, 2}, {3, 3, 3}, {4, 4, 4}};
-    Record r[8] = {{1, 1, 1}, {2, 2, 2}, {3, 3, 3}, {4, 4, 4}, {5, 5, 5}, {6, 6, 6}, {7, 7, 7}, {8, 8, 8}};
+    // Record r[8] = {{1, 1, 1}, {2, 2, 2}, {3, 3, 3}, {4, 4, 4}, {5, 5, 5}, {6, 6, 6}, {7, 7, 7}, {8, 8, 8}};
+    Run r[4] = {10, 10, 10, 10};
 
-    LoserTree *l = new LoserTree(r, 8);
+    LoserTree *l = new LoserTree(r, 4);
+    Record *r1 = l->next();
+    while (r1 != nullptr) {
+        std::cout << "Pulled value : " << r1->row1 << "\n";
+        r1 = l->next();
+    }
 
     delete l;
 }
@@ -93,8 +99,8 @@ void testRun() {
 int main() {
     // testScanIterator();
     // testSortIterator();
-    // testLoserTree();
-    testRun();
+    testLoserTree();
+    // testRun();
     
     std::cout << "All unit tests passed.\n";
     return 0;
