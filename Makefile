@@ -8,13 +8,13 @@ SCRS=
 
 # headers and code sources with updated paths
 HDRS=	include/defs.h \
-		include/Iterator.h include/Scan.h include/Filter.h include/Sort.h include/Record.h include/VerifyOrder.h src/LoserTree.h
+		include/Iterator.h include/Scan.h include/Filter.h include/Sort.h include/Record.h include/VerifyOrder.h include/LoserTree.h include/ExternalMergeSort.h
 SRCS=	src/defs.cpp src/Assert.cpp src/Test.cpp src/TestMain.cpp \
-		src/Iterator.cpp src/Scan.cpp src/Filter.cpp src/Sort.cpp src/Record.cpp src/VerifyOrder.cpp src/LoserTree.cpp
+		src/Iterator.cpp src/Scan.cpp src/Filter.cpp src/Sort.cpp src/Record.cpp src/VerifyOrder.cpp src/LoserTree.cpp src/ExternalMergeSort.cpp
 
 # compilation targets
 OBJS=	defs.o Assert.o Test.o TestMain.o \
-		Iterator.o Scan.o Filter.o Sort.o Record.o VerifyOrder.o LoserTree.o
+		Iterator.o Scan.o Filter.o Sort.o Record.o VerifyOrder.o LoserTree.o ExternalMergeSort.o
 
 # default target
 Test.exe : $(OBJS)

@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <iostream>
 
-LoserTree::LoserTree(Run runs[], int runCount) : _runs(runs), _runCount(runCount){
+LoserTree::LoserTree(Run **runs, int runCount) : _runs(runs), _runCount(runCount){
     _tree = (int*) malloc(runCount * sizeof(int));
     buildTree();
 };
@@ -15,7 +15,7 @@ LoserTree::~LoserTree() {
 Record *LoserTree::next() {
     // Grab the overall winner
     int winner = _tree[0];
-    Record* r = _runs[winner].pop();
+    Record* r = _runs[winner]->pop();
     // Determine the leaf node corresponding to winner's first comparison
     int startIdx = (_runCount + _tree[0]) / 2;
     // Replay the games from that tree leaf to root
@@ -36,8 +36,8 @@ void LoserTree::replayGame(int idx, int prevWinner) {
     // moves to the parent node (i.e. the winner)
     int prevLoser = _tree[idx];
     int winner = -1, loser = -1;
-    Record *rl = _runs[prevLoser].peek();
-    Record *rw = _runs[prevWinner].peek();
+    Record *rl = _runs[prevLoser]->peek();
+    Record *rw = _runs[prevWinner]->peek();
     if (rl == nullptr) {
         // std::cout << "Index " << prevLoser << " is out of records - " <<  prevWinner << " wins \n";
         winner = prevWinner;
@@ -71,7 +71,7 @@ void LoserTree::buildTree() {
         for(int i = 0; i < half; i++) {
             int idx1 = _tmp[2 * i];
             int idx2 = _tmp[2 * i + 1];
-            if (*(_runs[idx1].peek()) <= *(_runs[idx2].peek())) {
+            if (*(_runs[idx1]->peek()) <= *(_runs[idx2]->peek())) {
                 std::cout << "Index " << idx1 << " beat out Index " << idx2 << "\n";
                 _tree[half + i] = idx2;
                 _tmp[i] = idx1;
@@ -100,37 +100,92 @@ void LoserTree::printTree(){
     std::cout << "]\n";
 }
 
-Run::Run(int size) : _size(size), _idx(0) {
-    // Allocate Record array
-    _r = (Record *)malloc(_size * sizeof(Record));
-    // Populate Record array
-    int start = rand() % 5;
-    for(int i = 0; i < _size; i++) {
-        _r[i].row1 = start;
-        _r[i].row2 = start;
-        _r[i].row3 = start;
-        start += rand() % 5;
-    }
+Run::Run(int size) : _size(size), _produce_idx(0), _consume_idx(0) {
+    // Keep track of Record array
+    _r = (Record **) malloc(size * sizeof(Record *));
+}
 
-    // "Print" Record array
-    std::cout << "Run data: ";
-    for(int i = 0; i < _size; i++) {
-        std::cout << _r[i].row1 << ", ";
+void Run::push(Record * record) {
+    if (record != nullptr) {
+        _r[_produce_idx++] = record;
     }
-    std::cout << "\n";
 }
 
 Record *Run::peek() {
-    return _r + _idx;
+    if (_consume_idx < _size) {
+        return _r[_consume_idx];
+    }
+    return nullptr;
 }
 
 Record *Run::pop() {
-    if (_idx < _size) {
-        return _r + _idx++;
+    if (_consume_idx < _size) {
+        return _r[_consume_idx++];
     }
     return nullptr;
 }
 
 Run::~Run() {
     free(_r);
+}
+
+void Run::sort() {
+    int n = _produce_idx;
+    if (_r[0] == nullptr) {
+        return;
+    }
+    for (int curr_size = 1; curr_size <= n - 1; curr_size = 2 * curr_size) {
+        for (int left_start = 0; left_start < n - 1; left_start += 2 * curr_size) {
+            int mid = std::min(left_start + curr_size - 1, n - 1);
+            int right_end = std::min(left_start + 2 * curr_size - 1, n - 1);
+            merge(left_start, mid, right_end);
+        }
+    }
+
+}
+
+// Merge function for merge sort
+void Run::merge(int l, int m, int r) {
+    int n1 = m - l + 1;
+    int n2 = r - m;
+
+    // TODO: Don't malloc every time - malloc once at the beginning of the sort call
+    Record ** L = (Record **)malloc(n1 * sizeof(Record *));
+    Record ** R = (Record **)malloc(n2 * sizeof(Record *));
+    
+    for (int i = 0; i < n1; i++)
+        L[i] = _r[l + i];
+    for (int j = 0; j < n2; j++)
+        R[j] = _r[m + 1 + j];
+
+    int i = 0;
+    int j = 0;
+    int k = l;
+
+    while (i < n1 && j < n2) {
+        if (*L[i] <= *R[j]) {
+            _r[k] = L[i];
+            i++;
+        }
+        else {
+            _r[k] = R[j];
+            j++;
+        }
+        k++;
+    }
+
+    while (i < n1) {
+        _r[k] = L[i];
+        i++;
+        k++;
+    }
+
+    while (j < n2) {
+        _r[k] = R[j];
+        j++;
+        k++;
+    }
+
+    free(L);
+    free(R);
 }

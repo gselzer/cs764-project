@@ -36,7 +36,7 @@ ScanIterator::~ScanIterator ()
 
 Record* ScanIterator::next ()
 {
-    TRACE (true);
+    // TRACE (true);
     if (_count >= _plan->_count) {
         return nullptr; // Stopping condition
     }
