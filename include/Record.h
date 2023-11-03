@@ -1,5 +1,6 @@
 
 #include "defs.h"
+#include <ostream>
 #pragma once
 class Record {
 public:
@@ -9,4 +10,5 @@ public:
     bool operator<= (Record that);
     bool operator== (Record that);
     void operator^= (Record that);
+    friend std::ostream& operator<<(std::ostream& os, const Record& obj);
 };

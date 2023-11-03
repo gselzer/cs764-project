@@ -1,4 +1,5 @@
 #include "Record.h"
+#include <ostream>
 // Constructor
 Record::Record(int r1, int r2, int r3) : row1(r1), row2(r2), row3(r3) {
 	TRACE(false);
@@ -16,7 +17,7 @@ bool Record::operator<=(Record that) {
 		(this->row1 == that.row1 && this->row2 < that.row2) ||
 		(this->row1 == that.row1 && this->row2 == that.row2 && this->row3 < that.row3)
 	);
-};
+}
 
 bool Record::operator==(Record that) {
 	return (
@@ -24,10 +25,16 @@ bool Record::operator==(Record that) {
 		(this->row2 == that.row2) &&
 		(this->row3 == that.row3)
 	);
-};
+}
 
 void Record::operator^=(Record that) {
 	row1 ^= that.row1;
 	row2 ^= that.row2;
 	row3 ^= that.row3;
-};
+}
+
+std::ostream& operator<<(std::ostream& os, Record const &r) {
+	os << "Record: [" << r.row1 << ", " << r.row2 << ", " << r.row3 << "]";
+	return os;
+}
+

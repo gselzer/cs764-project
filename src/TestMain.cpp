@@ -56,7 +56,7 @@ void testVerifyContentIterator() {
         if (record == nullptr) {
             break;
         }
-        std::cout << record->row1 << "\n";
+        std::cout << *record << "\n";
         delete record;
     }
     
