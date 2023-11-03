@@ -6,6 +6,7 @@
 LoserTree::LoserTree(Run **runs, int runCount) : _runs(runs), _runCount(runCount){
     _tree = (int*) malloc(runCount * sizeof(int));
     buildTree();
+    std::cout << "Loser Tree Constructed!";
 };
 
 LoserTree::~LoserTree() {
@@ -62,7 +63,7 @@ void LoserTree::replayGame(int idx, int prevWinner) {
 }
 
 void LoserTree::buildTree() {
-    std::cout << "Building Tree...\n";
+    std::cout << "Building Tree with " << _runCount << " runs...\n";
     int* _tmp = (int*) malloc(_runCount * sizeof(int));
     for(int i = 0; i < _runCount; i++) {
         _tmp[i] = i;
@@ -71,12 +72,14 @@ void LoserTree::buildTree() {
         for(int i = 0; i < half; i++) {
             int idx1 = _tmp[2 * i];
             int idx2 = _tmp[2 * i + 1];
-            if (*(_runs[idx1]->peek()) <= *(_runs[idx2]->peek())) {
-                std::cout << "Index " << idx1 << " beat out Index " << idx2 << "\n";
+            Record *r1 = _runs[idx1]->peek();
+            Record *r2 = _runs[idx2]->peek();
+            if (r2 == nullptr || (r1 != nullptr && *r1 <= *r2)) {
+                // std::cout << "Index " << idx1 << " beat out Index " << idx2 << "\n";
                 _tree[half + i] = idx2;
                 _tmp[i] = idx1;
             } else {
-                std::cout << "Index " << idx2 << " beat out Index " << idx1 << "\n";
+                // std::cout << "Index " << idx2 << " beat out Index " << idx1 << "\n";
                 _tree[half + i] = idx1;
                 _tmp[i] = idx2;
             }

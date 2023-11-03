@@ -7,6 +7,9 @@ public:
     int row1, row2, row3;
     ~Record();
     Record(int r1, int r2, int r3);
+    void set(Record *other);
+
+    Record &operator= (const Record &that);
     bool operator<= (Record that);
     bool operator== (Record that);
     void operator^= (Record that);

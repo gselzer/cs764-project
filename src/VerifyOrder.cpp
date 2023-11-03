@@ -22,11 +22,9 @@ Iterator * VerifyOrderPlan::init () const
 
 VerifyOrderIterator::VerifyOrderIterator (VerifyOrderPlan const * const plan) :
 	_plan (plan),
-	_input (_plan->_input->init()),
-	_lastValue(std::numeric_limits<int>::min()) // TODO: Consider types other than ints
+	_input (_plan->_input->init())
 {
 	TRACE (false);
-
 } // VerifyOrderIterator::VerifyOrderIterator
 
 VerifyOrderIterator::~VerifyOrderIterator ()
@@ -44,8 +42,13 @@ Record* VerifyOrderIterator::next ()
     TRACE (false);
 	Record *r = _input->next();
 	if (r != nullptr) {
-		assert(r->row1 >= _lastValue);
-		_lastValue = r->row1;
+		_produced++;
+		if (_last != nullptr) {
+			// std::cout << "Comparing " << *_last << " and " << *r << "\n";
+			assert(*_last <= *r);
+		}
+		_last = r;
+		_consumed++;
 	}
 	return r;
 }// VerifyOrderIterator::next

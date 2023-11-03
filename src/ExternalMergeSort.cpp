@@ -27,12 +27,6 @@ ExternalMergeSortIterator::ExternalMergeSortIterator(const ExternalMergeSortPlan
         Run *run = new Run(runSize);
         // Fill in the run array
         for (int i = 0; i < runSize; i++) {
-            if (r == nullptr) {
-                std::cout << "Grabbing the next (null) element!\n";
-            }
-            else {
-                std::cout << "Grabbing the next element: " << r->row1 << "\n";
-            }
             run->push(r);
             r = _input->next();
         }

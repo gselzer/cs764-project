@@ -24,5 +24,5 @@ private:
 	VerifyOrderPlan const * const _plan;
 	Iterator * const _input;
 	RowCount _consumed, _produced;
-	int _lastValue;
+	Record *_last;
 }; // class VerifyOrderIterator

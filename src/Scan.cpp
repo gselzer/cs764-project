@@ -1,4 +1,5 @@
 #include "Scan.h"
+#include<iostream>
 #include<cstdlib>
 
 ScanPlan::ScanPlan (RowCount const count) : _count (count)
@@ -41,9 +42,13 @@ Record* ScanIterator::next ()
         return nullptr; // Stopping condition
     }
     _count++;
-    return new Record(
+    Record * r = new Record(
 		rand() % 100, // Row 1
 		rand() % 100, // Row 2
 		rand() % 100  // Row 3
 	);
+	if (r->row1 > 100 || r->row2 > 100 || r->row3 > 100) {
+		std::cout << "Erroneous row: " << *r << "\n";
+	}
+	return r;
 }// ScanIterator::next

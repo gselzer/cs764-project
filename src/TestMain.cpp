@@ -37,7 +37,7 @@ void testVerifyContentIterator() {
     std::cout << "Running SortIterator tests...\n";
     
     // Manually creating some records for testing
-    int noRecords = 10;
+    int noRecords = 100;
 
     // Assuming SortPlan takes another Plan as input
     ScanPlan scanPlan(noRecords);  // Just a placeholder; replace with your actual input plan
@@ -61,6 +61,37 @@ void testVerifyContentIterator() {
     }
     
     // delete sortIt;
+    delete sortIt;
+    
+    std::cout << "SortIterator tests passed.\n";
+}
+
+void testSortIterator() {
+    std::cout << "Running SortIterator tests...\n";
+    
+    // Manually creating some records for testing
+    int noRecords = 2 << 11;
+    std::cout << "Sorting " << noRecords << " records...\n";
+
+    // Assuming SortPlan takes another Plan as input
+    ScanPlan scanPlan(noRecords);  // Just a placeholder; replace with your actual input plan
+    ExternalMergeSortPlan sortPlan(&scanPlan);
+    // VerifyOrderPlan validPlan(&sortPlan);
+
+    // Initialize SortIterator
+    Iterator* sortIt = sortPlan.init();
+    
+    std::cout << "Getting next element\n";
+    int i = 0;
+    while (true) {
+        Record* record = sortIt->next();
+        if (record == nullptr) {
+            break;
+        }
+        std::cout << i++ << ": " << *record << "\n";
+        delete record;
+    }
+    
     delete sortIt;
     
     std::cout << "SortIterator tests passed.\n";
