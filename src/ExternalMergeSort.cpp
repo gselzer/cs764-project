@@ -48,7 +48,7 @@ ExternalMergeSortIterator::ExternalMergeSortIterator(const ExternalMergeSortPlan
         records.push_back(new Run(0));
     }
     Run ** runArray = (Run**) malloc(records.size() * sizeof(Run*));
-    for(int i = 0; i < records.size(); i++) {
+    for(size_t i = 0; i < records.size(); i++) {
         runArray[i] = records[i];
     }
     
