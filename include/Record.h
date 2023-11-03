@@ -7,4 +7,6 @@ public:
     ~Record();
     Record(int r1, int r2, int r3);
     bool operator<= (Record that);
+    bool operator== (Record that);
+    void operator^= (Record that);
 };

@@ -4,6 +4,7 @@
 #include "../include/Filter.h"
 #include "../include/Sort.h"
 #include "../include/VerifyOrder.h"
+#include "../include/VerifyContent.h"
 #include "../include/LoserTree.h"
 #include <iostream>
 #include <cassert>
@@ -36,15 +37,18 @@ void testSortIterator() {
     std::cout << "Running SortIterator tests...\n";
     
     // Manually creating some records for testing
-    int noRecords = 9;
+    int noRecords = 10;
 
     // Assuming SortPlan takes another Plan as input
     ScanPlan scanPlan(noRecords);  // Just a placeholder; replace with your actual input plan
-    ExternalMergeSortPlan sortPlan(&scanPlan);
+    VerifyContentState state;
+    VerifyContentPlan verifyProducerPlan(&scanPlan, &state, true);
+    ExternalMergeSortPlan sortPlan(&verifyProducerPlan);
+    VerifyContentPlan verifyConsumerPlan(&sortPlan, &state, false);
     // VerifyOrderPlan verifyPlan(&sortPlan);
 
     // Initialize SortIterator
-    Iterator* sortIt = sortPlan.init();
+    Iterator* sortIt = verifyConsumerPlan.init();
     
     std::cout << "Getting next element\n";
     while (true) {
