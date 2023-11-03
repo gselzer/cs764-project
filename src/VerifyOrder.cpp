@@ -35,6 +35,8 @@ VerifyOrderIterator::~VerifyOrderIterator ()
 	traceprintf ("produced %lu of %lu rows\n",
 			(unsigned long) (_produced),
 			(unsigned long) (_consumed));
+
+    delete _input;
 } // VerifyOrderIterator::~VerifyOrderIterator
 
 Record* VerifyOrderIterator::next ()

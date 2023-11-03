@@ -7,7 +7,6 @@
 ExternalMergeSortPlan::ExternalMergeSortPlan(Plan* input) : _input(input) {}
 
 ExternalMergeSortPlan::~ExternalMergeSortPlan() {
-    delete _input;
 }
 
 Iterator* ExternalMergeSortPlan::init() const {
@@ -62,8 +61,8 @@ ExternalMergeSortIterator::ExternalMergeSortIterator(const ExternalMergeSortPlan
 }
 
 ExternalMergeSortIterator::~ExternalMergeSortIterator() {
-    // delete _input;
-    // delete _tree;
+    TRACE(true);
+    delete _input;
 }
 
 Record* ExternalMergeSortIterator::next() {

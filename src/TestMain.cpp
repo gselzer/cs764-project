@@ -33,7 +33,7 @@ void testScanIterator() {
     std::cout << "ScanIterator tests passed.\n";
 }
 
-void testSortIterator() {
+void testVerifyContentIterator() {
     std::cout << "Running SortIterator tests...\n";
     
     // Manually creating some records for testing
