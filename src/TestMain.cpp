@@ -6,6 +6,7 @@
 #include "../include/VerifyOrder.h"
 #include "../include/VerifyContent.h"
 #include "../include/LoserTree.h"
+#include "../include/Run.h"
 #include <iostream>
 #include <cassert>
 #include <vector>
@@ -118,7 +119,7 @@ void testLoserTree() {
 
 void testRun() {
     int numRecords = 10;
-    Run * r = new Run(2 * numRecords);
+    CacheSizedRun * r = new CacheSizedRun();
 
     // Populate Record array
     Record * records = (Record *) malloc(numRecords * sizeof(Record));

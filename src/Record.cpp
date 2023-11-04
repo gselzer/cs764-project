@@ -1,14 +1,19 @@
 #include "Record.h"
 #include <ostream>
+
+Record::Record(Record *other) : row1(other->row1), row2(other->row2), row3(other->row3) {
+	TRACE(false);
+}
+
 // Constructor
 Record::Record(int r1, int r2, int r3) : row1(r1), row2(r2), row3(r3) {
 	TRACE(false);
-}// ScanPlan::ScanPlan
+}
 
 // Destructor
 Record::~Record() {
 	TRACE(false);
-}// ScanPlan::~ScanPlan
+}
 
 
 void Record::set(Record *other) {

@@ -2,6 +2,7 @@
 #include "Iterator.h"
 #include "LoserTree.h"
 #include "Record.h"
+#include "Run.h"
 #include <vector>
 
 class ExternalMergeSortPlan : public Plan
