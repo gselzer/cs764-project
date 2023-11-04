@@ -25,6 +25,8 @@ VerifyOrderIterator::VerifyOrderIterator (VerifyOrderPlan const * const plan) :
 	_input (_plan->_input->init())
 {
 	TRACE (false);
+	int min = std::numeric_limits<int>::min();
+	_last = new Record(min, min, min);
 } // VerifyOrderIterator::VerifyOrderIterator
 
 VerifyOrderIterator::~VerifyOrderIterator ()
@@ -35,6 +37,7 @@ VerifyOrderIterator::~VerifyOrderIterator ()
 			(unsigned long) (_consumed));
 
     delete _input;
+	delete _last;
 } // VerifyOrderIterator::~VerifyOrderIterator
 
 Record* VerifyOrderIterator::next ()
@@ -43,11 +46,8 @@ Record* VerifyOrderIterator::next ()
 	Record *r = _input->next();
 	if (r != nullptr) {
 		_produced++;
-		if (_last != nullptr) {
-			// std::cout << "Comparing " << *_last << " and " << *r << "\n";
-			assert(*_last <= *r);
-		}
-		_last = r;
+		assert(*_last <= *r);
+		*_last = *r;
 		_consumed++;
 	}
 	return r;
