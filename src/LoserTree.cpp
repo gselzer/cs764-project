@@ -88,7 +88,7 @@ void LoserTree::buildTree() {
         }
     }
     _tree[0] = _tmp[0];
-    printTree();
+    // printTree();
 
     free(_tmp);
 }

@@ -20,7 +20,10 @@ ExternalMergeSortIterator::ExternalMergeSortIterator(const ExternalMergeSortPlan
 {
     // Step 1: Create Runs
     std::vector<Run*> records;
-    int runSize = 5;
+    // The CPU cache size is 1MB
+    // We will thus make runs of size 0.5MB for quick internal run sorting
+    int runBytes = 2 << 18;
+    int runSize = runBytes / sizeof(Record);
     Record *r;
     r = _input->next();
     while (r != nullptr) {

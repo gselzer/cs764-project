@@ -70,16 +70,19 @@ void testSortIterator() {
     std::cout << "Running SortIterator tests...\n";
     
     // Manually creating some records for testing
-    int noRecords = 2 << 11;
+    int noRecords = 2 << 20;
     std::cout << "Sorting " << noRecords << " records...\n";
 
     // Assuming SortPlan takes another Plan as input
     ScanPlan scanPlan(noRecords);  // Just a placeholder; replace with your actual input plan
-    ExternalMergeSortPlan sortPlan(&scanPlan);
-    // VerifyOrderPlan validPlan(&sortPlan);
+    VerifyContentState state;
+    VerifyContentPlan verifyProducerPlan(&scanPlan, &state, true);
+    ExternalMergeSortPlan sortPlan(&verifyProducerPlan);
+    VerifyOrderPlan validPlan(&sortPlan);
+    VerifyContentPlan verifyConsumerPlan(&validPlan, &state, false);
 
     // Initialize SortIterator
-    Iterator* sortIt = sortPlan.init();
+    Iterator* sortIt = verifyConsumerPlan.init();
     
     std::cout << "Getting next element\n";
     int i = 0;
