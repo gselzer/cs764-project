@@ -17,6 +17,7 @@ Record *LoserTree::next() {
     // Grab the overall winner
     int winner = _tree[0];
     Record* r = _runs[winner]->pop();
+    // std::cout << *r << " was the winner\n";
     // Determine the leaf node corresponding to winner's first comparison
     int startIdx = (_runCount + _tree[0]) / 2;
     // Replay the games from that tree leaf to root
@@ -115,14 +116,14 @@ void Run::push(Record * record) {
 }
 
 Record *Run::peek() {
-    if (_consume_idx < _size) {
+    if (_consume_idx < _produce_idx) {
         return _r[_consume_idx];
     }
     return nullptr;
 }
 
 Record *Run::pop() {
-    if (_consume_idx < _size) {
+    if (_consume_idx < _produce_idx) {
         return _r[_consume_idx++];
     }
     return nullptr;
