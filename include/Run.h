@@ -4,6 +4,7 @@
 
 #define RUN_BYTES 2 << 18
 #define RUN_RECORDS (RUN_BYTES) / sizeof(Record)
+#define PAGE_SIZE 4096
 
 class Run {
 public:
@@ -34,14 +35,18 @@ private:
     int _consume_idx;
 }; // class Run
 
-// class FileBackedRun: public Run {
-// public:
-//     FileBackedRun(int size);
-//     ~FileBackedRun();
-//     void push(Record *);
-//     void sort();
-//     Record* peek();
-//     Record* pop();
-// private:
-//     std::FILE *file;
-// }; // class FileBackedRun
+class FileBackedRun: public Run {
+public:
+    FileBackedRun();
+    ~FileBackedRun();
+    void push(Record *);
+    void harden();
+    Record* peek();
+    Record* pop();
+private:
+    std::FILE *file;
+    Record *buffer;
+    int _produce_idx;
+    int _consume_idx;
+    const int bufSize = (PAGE_SIZE) / sizeof(Record);
+}; // class FileBackedRun

@@ -1,4 +1,5 @@
 #include "Run.h"
+#include <iostream>
 #include <exception>
 
 CacheSizedRun::CacheSizedRun(): _produce_idx(0), _consume_idx(0) {
@@ -103,3 +104,46 @@ Record* EmptyRun::peek() {
 Record* EmptyRun::pop() {
     return nullptr;
 }
+
+FileBackedRun::FileBackedRun(): _produce_idx(0), _consume_idx(0){
+    file = std::tmpfile();
+    buffer = (Record *) malloc(PAGE_SIZE);
+}
+
+FileBackedRun::~FileBackedRun() {
+    std::fclose(file);
+    free(buffer);
+}
+
+void FileBackedRun::push(Record * other) {
+    buffer[_produce_idx % bufSize] = other;
+    free(other);
+    _produce_idx++;
+    if (_produce_idx % bufSize == 0) {
+        std::fwrite(buffer, sizeof(Record), bufSize, file);
+    }
+}
+
+// This function should be called once all Records that this Run should store
+// have been pushed, and we are ready to start popping records. Before this
+// function is called, Records should not be popped, and after this function
+// is called, Records should not be pushed.
+void FileBackedRun::harden() {
+    std::fwrite(buffer, sizeof(Record), _produce_idx % bufSize, file);
+    rewind(file);
+}
+
+Record *FileBackedRun::peek() {
+    return new Record(buffer[_consume_idx]);
+}
+
+Record *FileBackedRun::pop() {
+    if (_consume_idx < _produce_idx) {
+        if (_consume_idx % bufSize == 0) {
+            int noRead = fread(buffer, sizeof(Record), bufSize, file);
+        }
+        Record *r =new Record(buffer[_consume_idx++ % bufSize]);
+        return r;
+    } return nullptr;
+}
+

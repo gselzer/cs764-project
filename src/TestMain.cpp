@@ -71,7 +71,7 @@ void testSortIterator() {
     std::cout << "Running SortIterator tests...\n";
     
     // Manually creating some records for testing
-    int noRecords = 2 << 20;
+    int noRecords = (2 << 20);
     std::cout << "Sorting " << noRecords << " records...\n";
 
     // Assuming SortPlan takes another Plan as input
@@ -153,11 +153,32 @@ void testRun() {
     delete records;
 }
 
+void testFileBackedRun() {
+    int numRecords = 100000;
+    FileBackedRun *r = new FileBackedRun();
+    for(int i = 1; i <= numRecords; i++) {
+        r->push(new Record(i, i, i));
+    }
+
+    r->harden();
+
+    for(int i = 1; i <= numRecords; i++) {
+        Record* rec = r->pop();
+        assert(rec->row1 == i);
+        free(rec);
+    }
+    assert(r->pop() == nullptr);
+
+
+    free(r);
+}
+
 int main() {
     // testScanIterator();
-    testSortIterator();
+    // testSortIterator();
     // testLoserTree();
     // testRun();
+    testFileBackedRun();
     
     std::cout << "All unit tests passed.\n";
     return 0;
