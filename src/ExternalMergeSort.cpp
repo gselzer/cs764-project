@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 
+
 ExternalMergeSortPlan::ExternalMergeSortPlan(Plan* input) : _input(input) {}
 
 ExternalMergeSortPlan::~ExternalMergeSortPlan() {
@@ -38,16 +39,18 @@ ExternalMergeSortIterator::ExternalMergeSortIterator(const ExternalMergeSortPlan
 
     // Step 2: Build the Loser Tree
     // Step 2.1: Obtain a run array that is a power of 2
-    while (!IsPowerOf2(records.size())) {
-        records.push_back(new EmptyRun());
-    }
     Run ** runArray = (Run**) malloc(records.size() * sizeof(Run*));
     for(size_t i = 0; i < records.size(); i++) {
         runArray[i] = records[i];
     }
     
     // Step 2.2: Build a Run[]
-    _tree = new LoserTree(runArray, records.size());
+    if (records.size() * RUN_BYTES > CACHE_SIZE) {
+        _tree = new LoserTree(runArray, records.size());
+    }
+    else {
+        _tree = new MultiStageLoserTree(runArray, records.size());
+    }
 
 
     // records.clear();

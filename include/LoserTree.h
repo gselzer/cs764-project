@@ -2,8 +2,9 @@
 #include "defs.h"
 #include "Record.h"
 #include "Run.h"
+#include "Tree.h"
 
-class LoserTree
+class LoserTree: public Tree
 {
 	friend class ExternalMergeSortIterator;
 public:
@@ -17,4 +18,16 @@ private:
     int _runCount;
     int* _tree;
     Run** _runs;
+}; // class LoserTree
+
+class MultiStageLoserTree: public Tree
+{
+	friend class ExternalMergeSortIterator;
+public:
+    MultiStageLoserTree(Run **runs, int runCount);
+    ~MultiStageLoserTree();
+    Record* next();
+private:
+    Run **_runs;
+    int _count;
 }; // class LoserTree

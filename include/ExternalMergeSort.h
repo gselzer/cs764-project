@@ -29,5 +29,5 @@ private:
 	RowCount _consumed, _produced;
     size_t _currentIdx;  // New Addition
 	Run *_runs;
-	LoserTree *_tree;
+	Tree *_tree;
 }; // class ExternalMergeSortIterator

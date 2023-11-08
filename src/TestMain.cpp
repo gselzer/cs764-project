@@ -11,10 +11,10 @@
 #include <cassert>
 #include <vector>
 
-void testScanIterator() {
+void testScanIterator(int numRecords) {
     std::cout << "Running ScanIterator tests...\n";
     
-    ScanPlan scanPlan(100);  // Assuming ScanPlan's constructor takes an integer argument for the number of records
+    ScanPlan scanPlan(numRecords);  // Assuming ScanPlan's constructor takes an integer argument for the number of records
     Iterator* scanIt = scanPlan.init();
     
     int count = 0;
@@ -34,14 +34,14 @@ void testScanIterator() {
     std::cout << "ScanIterator tests passed.\n";
 }
 
-void testVerifyContentIterator() {
+void testVerifyContentIterator(int numRecords) {
     std::cout << "Running SortIterator tests...\n";
     
     // Manually creating some records for testing
-    int noRecords = 100;
+
 
     // Assuming SortPlan takes another Plan as input
-    ScanPlan scanPlan(noRecords);  // Just a placeholder; replace with your actual input plan
+    ScanPlan scanPlan(numRecords);  // Just a placeholder; replace with your actual input plan
     VerifyContentState state;
     VerifyContentPlan verifyProducerPlan(&scanPlan, &state, true);
     ExternalMergeSortPlan sortPlan(&verifyProducerPlan);
@@ -67,15 +67,14 @@ void testVerifyContentIterator() {
     std::cout << "SortIterator tests passed.\n";
 }
 
-void testSortIterator() {
+void testSortIterator(int numRecords) {
     std::cout << "Running SortIterator tests...\n";
     
     // Manually creating some records for testing
-    int noRecords = (2 << 20);
-    std::cout << "Sorting " << noRecords << " records...\n";
+    std::cout << "Sorting " << numRecords << " records...\n";
 
     // Assuming SortPlan takes another Plan as input
-    ScanPlan scanPlan(noRecords);  // Just a placeholder; replace with your actual input plan
+    ScanPlan scanPlan(numRecords);  // Just a placeholder; replace with your actual input plan
     VerifyContentState state;
     VerifyContentPlan verifyProducerPlan(&scanPlan, &state, true);
     ExternalMergeSortPlan sortPlan(&verifyProducerPlan);
@@ -117,8 +116,8 @@ void testLoserTree() {
     // delete l;
 }
 
-void testRun() {
-    int numRecords = 10;
+void testRun(int numRecords) {
+    
     CacheSizedRun * r = new CacheSizedRun();
 
     // Populate Record array
@@ -153,8 +152,8 @@ void testRun() {
     delete records;
 }
 
-void testFileBackedRun() {
-    int numRecords = 100000;
+void testFileBackedRun(int numRecords) {
+    
     FileBackedRun *r = new FileBackedRun();
     for(int i = 1; i <= numRecords; i++) {
         r->push(new Record(i, i, i));
@@ -174,11 +173,12 @@ void testFileBackedRun() {
 }
 
 int main() {
-    // testScanIterator();
-    // testSortIterator();
-    // testLoserTree();
-    // testRun();
-    testFileBackedRun();
+    int numRecords = 1024;
+    // testScanIterator(numRecords);
+    testSortIterator(numRecords);
+    // testLoserTree(numRecords);
+    // testRun(numRecords);
+    // testFileBackedRun(numRecords);
     
     std::cout << "All unit tests passed.\n";
     return 0;

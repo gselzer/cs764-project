@@ -130,6 +130,7 @@ void FileBackedRun::push(Record * other) {
 // is called, Records should not be pushed.
 void FileBackedRun::harden() {
     std::fwrite(buffer, sizeof(Record), _produce_idx % bufSize, file);
+    std::cout << "Wrote " << _produce_idx << " Records to the file\n";
     rewind(file);
 }
 
@@ -141,8 +142,11 @@ Record *FileBackedRun::pop() {
     if (_consume_idx < _produce_idx) {
         if (_consume_idx % bufSize == 0) {
             int noRead = fread(buffer, sizeof(Record), bufSize, file);
+            std::cout << "Read " << noRead << " Records from the file\n";
         }
-        Record *r =new Record(buffer[_consume_idx++ % bufSize]);
+        Record *r =new Record(buffer[_consume_idx % bufSize]);
+        std::cout << "Popped index " << (_consume_idx % bufSize) << *r << "\n";
+        _consume_idx++;
         return r;
     } return nullptr;
 }

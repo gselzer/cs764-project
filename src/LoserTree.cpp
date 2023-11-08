@@ -2,15 +2,32 @@
 #include "Run.h"
 #include "Record.h"
 #include <stdlib.h>
+#include <cstring>
 #include <iostream>
 
-LoserTree::LoserTree(Run **runs, int runCount) : _runs(runs), _runCount(runCount){
-    _tree = (int*) malloc(runCount * sizeof(int));
+LoserTree::LoserTree(Run **runs, int runCount){
+    // Set up runs array (array of Run pointers)
+    _runCount = runCount;
+    while(!IsPowerOf2(_runCount)) {
+        _runCount++;
+    }
+    _runs = (Run **) malloc(_runCount * sizeof(Run *));
+    std::memcpy(_runs, runs, runCount * sizeof(Run *));
+    for(int i = runCount; i < _runCount; i++) {
+        _runs[i] = new EmptyRun();
+    }
+    // Set up tree data structure
+    _tree = (int*) malloc(_runCount * sizeof(int));
+    // Build the Tree
     buildTree();
     std::cout << "Loser Tree Constructed!";
 };
 
 LoserTree::~LoserTree() {
+    for(int i = 0; i < _runCount; i++) {
+        free(_runs[i]);
+    }
+    free(_runs);
     free(_tree);
 }
 
@@ -103,4 +120,44 @@ void LoserTree::printTree(){
         std::cout << _tree[i] << ",";
     }
     std::cout << "]\n";
+}
+
+MultiStageLoserTree::MultiStageLoserTree(Run **runs, int count): _runs(runs), _count(count) {
+    int _f = 4; // 0.1 * CACHE_SIZE / (RUN_BYTES);
+    // Keep going until we only have one run left
+    while(_count > 1) {
+        int _storeIdx = 0;
+        int _readIdx = 0;
+        // Iterate across all runs
+        while(_readIdx < _count) {
+            // Construct a Loser Tree on _f consecutive runs
+            int remainingRuns = _count - _readIdx;
+            int numRuns = _f < remainingRuns ? _f : remainingRuns;
+            LoserTree *tree = new LoserTree(_runs + _readIdx, numRuns);
+            // Read out the sorted results to a file-backed run
+            FileBackedRun *run = new FileBackedRun();
+            Record *r = tree->next();
+            int i = 0;
+            while(r != nullptr) {
+                run->push(r);
+                r = tree->next();
+                i++;
+            }
+            // Store the new run
+            run->harden();
+            _runs[_storeIdx++] = run;
+            // Increment readIdx
+            _readIdx += numRuns;
+            // Update count - we removed numRuns runs, but added one more.
+        }
+        _count -= (_storeIdx * (_f - 1));
+    }
+}
+
+MultiStageLoserTree::~MultiStageLoserTree() {
+
+}
+
+Record *MultiStageLoserTree::next() {
+    return _runs[0]->pop();
 }

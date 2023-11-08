@@ -2,10 +2,6 @@
 #include "defs.h"
 #include "Record.h"
 
-#define RUN_BYTES 2 << 18
-#define RUN_RECORDS (RUN_BYTES) / sizeof(Record)
-#define PAGE_SIZE 4096
-
 class Run {
 public:
     virtual void push(Record *) = 0;
