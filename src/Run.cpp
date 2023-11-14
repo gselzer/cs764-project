@@ -37,6 +37,7 @@ void CacheSizedRun::sort() {
     if (_produce_idx < 2) {
         return;
     }
+    // Step 1: Internal Merge Sort
     for (int curr_size = 1; curr_size <= n - 1; curr_size = 2 * curr_size) {
         for (int left_start = 0; left_start < n - 1; left_start += 2 * curr_size) {
             int mid = std::min(left_start + curr_size - 1, n - 1);
@@ -44,7 +45,11 @@ void CacheSizedRun::sort() {
             merge(left_start, mid, right_end);
         }
     }
-
+    // Step 2: Encode offset value
+    _records[0].encodeOVC(nullptr);
+    for (int i = 1; i < _produce_idx; i++) {
+        _records[i].encodeOVC(_records + i - 1);
+    }
 }
 
 // Merge function for merge sort
