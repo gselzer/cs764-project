@@ -110,13 +110,15 @@ Record* EmptyRun::pop() {
     return nullptr;
 }
 
-FileBackedRun::FileBackedRun(): _produce_idx(0), _consume_idx(0){
+FileBackedRun::FileBackedRun(RunStorageState *state): _produce_idx(0), _consume_idx(0){
+    _state = state;
     file = std::tmpfile();
     buffer = (Record *) malloc(PAGE_SIZE);
 }
 
 FileBackedRun::~FileBackedRun() {
     std::fclose(file);
+    _state->read(_produce_idx * sizeof(Record), _onSSD);
     free(buffer);
 }
 
@@ -135,6 +137,8 @@ void FileBackedRun::push(Record * other) {
 // is called, Records should not be pushed.
 void FileBackedRun::harden() {
     std::fwrite(buffer, sizeof(Record), _produce_idx % bufSize, file);
+    _onSSD = _state->write(_produce_idx * sizeof(Record));
+
     std::cout << "Wrote " << _produce_idx << " Records to the file\n";
     rewind(file);
 }
@@ -156,3 +160,47 @@ Record *FileBackedRun::pop() {
     } return nullptr;
 }
 
+RunStorageState::RunStorageState() : _ssdTime(0), _hddTime(0), _ssdAllocated(0), _hddAllocated(0) {
+}
+
+RunStorageState::~RunStorageState() {
+    std::cout << "Total SSD latency + transfer time: " << _ssdTime << "\n"; 
+    std::cout << "Total HDD latency + transfer time: " << _hddTime << "\n"; 
+}
+
+// Returns true iff "written to SSD"
+bool RunStorageState::write(const int noBytes) {
+    if (_ssd_size - _ssdAllocated > 0) {
+        // Write out to SSD
+        float transferTime = ((double) noBytes) / _ssd_bandwidth;
+        _ssdTime += _ssd_latency + transferTime;
+
+        _ssdAllocated += noBytes;
+        return true;
+    }
+    else {
+        // Write out to HDD
+        float transferTime = ((double) noBytes) / _hdd_bandwidth;
+        _hddTime += _hdd_latency + transferTime;
+
+        _hddAllocated += noBytes;
+        return false;
+    }
+}
+
+void RunStorageState::read(const int noBytes, const bool readFromSSD) {
+    if (readFromSSD) {
+        // Write out to SSD
+        float transferTime = ((double) noBytes) / _ssd_bandwidth;
+        _ssdTime += _ssd_latency + transferTime;
+
+        _ssdAllocated -= noBytes;
+    }
+    else {
+        // Write out to HDD
+        float transferTime = ((double) noBytes) / _hdd_bandwidth;
+        _hddTime += _hdd_latency + transferTime;
+
+        _hddAllocated -= noBytes;
+    }
+}

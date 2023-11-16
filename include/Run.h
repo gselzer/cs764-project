@@ -31,9 +31,29 @@ private:
     int _consume_idx;
 }; // class Run
 
+class RunStorageState
+{
+	public:
+	RunStorageState();
+	~RunStorageState();
+	bool write(const int noBytes);
+	void read(const int noBytes, const bool readFromSSD);
+	private:
+	const int _ssd_page_size = 4 * (2 << 9); // 4 KB
+	const int _hdd_page_size = 8 * (2 << 9); // 8 KB
+	const float _ssd_latency = 0.0001; // 0.1 ms
+	const float _hdd_latency = 0.01; // 10 ms
+	const int _ssd_bandwidth = 100 * (2 << 19); // 100 MB/s
+	const int _hdd_bandwidth = 100 * (2 << 19); // 100 MB/s
+	const long _ssd_size = 10 * (2 << 29); // 10 GB
+
+	int _ssdAllocated, _hddAllocated;
+	float _ssdTime, _hddTime;
+};
+
 class FileBackedRun: public Run {
 public:
-    FileBackedRun();
+    FileBackedRun(RunStorageState *state);
     ~FileBackedRun();
     void push(Record *);
     void harden();
@@ -44,5 +64,7 @@ private:
     Record *buffer;
     int _produce_idx;
     int _consume_idx;
+    RunStorageState *_state;
+    bool _onSSD; 
     const int bufSize = (PAGE_SIZE) / sizeof(Record);
 }; // class FileBackedRun

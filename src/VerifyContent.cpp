@@ -61,12 +61,16 @@ VerifyContentIterator::~VerifyContentIterator ()
 			(unsigned long) (_consumed));
 
 	assert (_plan->_state->allSeen());
+
+	delete _input;
 } // VerifyContentIterator::~VerifyContentIterator
 
 Record* VerifyContentIterator::next ()
 {
 	Record *r = _input->next();
 	if (r != nullptr) {
+		_consumed++;
+		_produced++;
 		if (_isProducer)
 			_plan->_state->incrementDiff(r);
 		else

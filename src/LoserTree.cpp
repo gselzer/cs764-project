@@ -122,7 +122,8 @@ void LoserTree::printTree(){
     std::cout << "]\n";
 }
 
-MultiStageLoserTree::MultiStageLoserTree(Run **runs, int count): _runs(runs), _count(count) {
+MultiStageLoserTree::MultiStageLoserTree(Run **runs, int count, RunStorageState *state): _runs(runs), _count(count){
+
     int _f = 4; // 0.1 * CACHE_SIZE / (RUN_BYTES);
     // Keep going until we only have one run left
     while(_count > 1) {
@@ -135,22 +136,20 @@ MultiStageLoserTree::MultiStageLoserTree(Run **runs, int count): _runs(runs), _c
             int numRuns = _f < remainingRuns ? _f : remainingRuns;
             LoserTree *tree = new LoserTree(_runs + _readIdx, numRuns);
             // Read out the sorted results to a file-backed run
-            FileBackedRun *run = new FileBackedRun();
+            FileBackedRun *run = new FileBackedRun(state);
             Record *r = tree->next();
             // Temp pointer to enable OVC calculation
-            Record *tmp;
-            r->encodeOVC(nullptr);
+            Record *tmp = nullptr;
             int i = 0;
             while(r != nullptr) {
+                r->encodeOVC(tmp);
+                std::cout << *r << "\n";
                 // Put Record on Run
                 run->push(r);
 
                 // Get new Record
-                tmp = tree->next();
-                // Encode its OVC
-                tmp->encodeOVC(r);
-                r = tmp;
-
+                tmp = r;
+                r = tree->next();
                 i++;
             }
             // Store the new run

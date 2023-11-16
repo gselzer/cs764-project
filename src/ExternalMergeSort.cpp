@@ -19,6 +19,7 @@ ExternalMergeSortIterator::ExternalMergeSortIterator(const ExternalMergeSortPlan
       _input(_plan->_input->init()),  
       _currentIdx(0)
 {
+    _state = new RunStorageState();
     // Step 1: Create Runs
     std::vector<Run*> records;
     Record *r;
@@ -49,7 +50,7 @@ ExternalMergeSortIterator::ExternalMergeSortIterator(const ExternalMergeSortPlan
         _tree = new LoserTree(runArray, records.size());
     }
     else {
-        _tree = new MultiStageLoserTree(runArray, records.size());
+        _tree = new MultiStageLoserTree(runArray, records.size(), _state);
     }
 
 
@@ -58,8 +59,9 @@ ExternalMergeSortIterator::ExternalMergeSortIterator(const ExternalMergeSortPlan
 }
 
 ExternalMergeSortIterator::~ExternalMergeSortIterator() {
-    TRACE(false);
+    TRACE(true);
     delete _input;
+    delete _state;
 }
 
 Record* ExternalMergeSortIterator::next() {

@@ -26,6 +26,7 @@ public:
 private:
 	ExternalMergeSortPlan const * const _plan;
 	Iterator * const _input;
+	RunStorageState *_state;
 	RowCount _consumed, _produced;
     size_t _currentIdx;  // New Addition
 	Run *_runs;

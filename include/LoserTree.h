@@ -24,7 +24,7 @@ class MultiStageLoserTree: public Tree
 {
 	friend class ExternalMergeSortIterator;
 public:
-    MultiStageLoserTree(Run **runs, int runCount);
+    MultiStageLoserTree(Run **runs, int runCount, RunStorageState *state);
     ~MultiStageLoserTree();
     Record* next();
 private:

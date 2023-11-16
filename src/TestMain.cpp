@@ -71,7 +71,7 @@ void testSortIterator(int numRecords) {
     std::cout << "Running SortIterator tests...\n";
     
     // Manually creating some records for testing
-    std::cout << "Sorting " << numRecords << " records...\n";
+    std::cout << "Sorting " << numRecords << " records (" << numRecords * sizeof(Record) << " bytes)...\n";
 
     // Assuming SortPlan takes another Plan as input
     ScanPlan scanPlan(numRecords);  // Just a placeholder; replace with your actual input plan
@@ -91,7 +91,7 @@ void testSortIterator(int numRecords) {
         if (record == nullptr) {
             break;
         }
-        std::cout << i++ << ": " << *record << "\n";
+        // std::cout << i++ << ": " << *record << "\n";
         delete record;
     }
     
@@ -153,8 +153,8 @@ void testRun(int numRecords) {
 }
 
 void testFileBackedRun(int numRecords) {
-    
-    FileBackedRun *r = new FileBackedRun();
+    RunStorageState *state = new RunStorageState();
+    FileBackedRun *r = new FileBackedRun(state);
     for(int i = 1; i <= numRecords; i++) {
         r->push(new Record(i, i, i));
     }
@@ -170,10 +170,11 @@ void testFileBackedRun(int numRecords) {
 
 
     free(r);
+    free(state);
 }
 
 int main() {
-    int numRecords = 1024;
+    int numRecords = 2 << 14;
     // testScanIterator(numRecords);
     testSortIterator(numRecords);
     // testLoserTree(numRecords);
