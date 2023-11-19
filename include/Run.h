@@ -64,6 +64,7 @@ private:
     Record *buffer;
     int _produce_idx;
     int _consume_idx;
+    Record *_last;
     RunStorageState *_state;
     bool _onSSD; 
     const int bufSize = (PAGE_SIZE) / sizeof(Record);

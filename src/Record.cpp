@@ -72,7 +72,7 @@ void Record::encodeOVC(Record *other) {
 		_value = row3;
 	} else {
 		// Equal records
-		_offset = 0;
+		_offset = 4;
 		_value = row1;
 	}
 
@@ -80,8 +80,11 @@ void Record::encodeOVC(Record *other) {
 
 bool Record::leOVC(Record *other) {
 	if (_offset != other->_offset) {
-		return _offset < other->_offset;
+		return _offset > other->_offset;
 	}
-	return _value <= other->_value;
+	if (_value != other->_value) {
+		return _value < other->_value;
+	}
+	return *this <= other;
 }
 

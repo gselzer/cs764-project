@@ -136,7 +136,6 @@ void testRun(int numRecords) {
 
     // Assert multiple calls of peek return same type
     assert(r->peek() == r->peek());
-    std::cout << "Done with sort!\n";
 
     // Assert pop returns new values until end
     int lastValue = -1;

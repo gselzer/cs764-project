@@ -20,7 +20,6 @@ LoserTree::LoserTree(Run **runs, int runCount){
     _tree = (int*) malloc(_runCount * sizeof(int));
     // Build the Tree
     buildTree();
-    std::cout << "Loser Tree Constructed!";
 };
 
 LoserTree::~LoserTree() {
@@ -35,7 +34,6 @@ Record *LoserTree::next() {
     // Grab the overall winner
     int winner = _tree[0];
     Record* r = _runs[winner]->pop();
-    // std::cout << *r << " was the winner\n";
     // Determine the leaf node corresponding to winner's first comparison
     int startIdx = (_runCount + _tree[0]) / 2;
     // Replay the games from that tree leaf to root
@@ -68,11 +66,13 @@ void LoserTree::replayGame(int idx, int prevWinner) {
         loser = prevWinner;
     } else if (rl->leOVC(rw)) {
         // std::cout << "Index " << prevLoser << " beat out Index " <<  prevWinner << "\n";
+        rw->encodeOVC(rl);
         winner = prevLoser;
         loser = prevWinner;
 
     } else {
         // std::cout << "Index " << prevWinner << " beat out Index " <<  prevLoser << "\n";
+        rl->encodeOVC(rw);
         winner = prevWinner;
         loser = prevLoser;
     }
@@ -94,11 +94,11 @@ void LoserTree::buildTree() {
             Record *r1 = _runs[idx1]->peek();
             Record *r2 = _runs[idx2]->peek();
             if (r2 == nullptr || (r1 != nullptr && r1->leOVC(r2))) {
-                // std::cout << "Index " << idx1 << " beat out Index " << idx2 << "\n";
+                r2->encodeOVC(r1);
                 _tree[half + i] = idx2;
                 _tmp[i] = idx1;
             } else {
-                // std::cout << "Index " << idx2 << " beat out Index " << idx1 << "\n";
+                r1->encodeOVC(r2);
                 _tree[half + i] = idx1;
                 _tmp[i] = idx2;
             }
@@ -139,16 +139,13 @@ MultiStageLoserTree::MultiStageLoserTree(Run **runs, int count, RunStorageState 
             FileBackedRun *run = new FileBackedRun(state);
             Record *r = tree->next();
             // Temp pointer to enable OVC calculation
-            Record *tmp = nullptr;
             int i = 0;
             while(r != nullptr) {
-                r->encodeOVC(tmp);
-                std::cout << *r << "\n";
                 // Put Record on Run
+                if (i < 10) {
+                    std::cout << "Adding Record to Stack: " << *r << "\n";
+                }
                 run->push(r);
-
-                // Get new Record
-                tmp = r;
                 r = tree->next();
                 i++;
             }

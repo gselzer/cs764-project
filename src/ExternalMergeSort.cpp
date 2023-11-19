@@ -28,7 +28,6 @@ ExternalMergeSortIterator::ExternalMergeSortIterator(const ExternalMergeSortPlan
         CacheSizedRun *run = new CacheSizedRun();
         // Fill in the run array
         for (int i = 0; i < RUN_RECORDS; i++) {
-            // std::cout << "Adding run " << i << "\n";
             run->push(r);
             r = _input->next();
         }
@@ -36,8 +35,6 @@ ExternalMergeSortIterator::ExternalMergeSortIterator(const ExternalMergeSortPlan
         records.push_back(run);
     } 
     
-    // std::cout << "Done creating " << records.size() << " runs\n";
-
     // Step 2: Build the Loser Tree
     // Step 2.1: Obtain a run array that is a power of 2
     Run ** runArray = (Run**) malloc(records.size() * sizeof(Run*));
@@ -47,6 +44,7 @@ ExternalMergeSortIterator::ExternalMergeSortIterator(const ExternalMergeSortPlan
     
     // Step 2.2: Build a Run[]
     if (records.size() * RUN_BYTES > CACHE_SIZE) {
+        
         _tree = new LoserTree(runArray, records.size());
     }
     else {

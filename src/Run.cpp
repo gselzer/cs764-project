@@ -15,14 +15,14 @@ void CacheSizedRun::push(Record * record) {
 
 Record *CacheSizedRun::peek() {
     if (_consume_idx < _produce_idx) {
-        return new Record(_records + _consume_idx);
+        return _records + _consume_idx;
     }
     return nullptr;
 }
 
 Record *CacheSizedRun::pop() {
     if (_consume_idx < _produce_idx) {
-        return new Record(_records + _consume_idx++);
+        return _records + _consume_idx++;
     }
     return nullptr;
 }
@@ -49,6 +49,9 @@ void CacheSizedRun::sort() {
     _records[0].encodeOVC(nullptr);
     for (int i = 1; i < _produce_idx; i++) {
         _records[i].encodeOVC(_records + i - 1);
+        if (i < 10) {
+            std::cout << _records[i] << "\n";
+        }
     }
 }
 
@@ -111,6 +114,7 @@ Record* EmptyRun::pop() {
 }
 
 FileBackedRun::FileBackedRun(RunStorageState *state): _produce_idx(0), _consume_idx(0){
+    _last = nullptr;
     _state = state;
     file = std::tmpfile();
     buffer = (Record *) malloc(PAGE_SIZE);
@@ -120,11 +124,14 @@ FileBackedRun::~FileBackedRun() {
     std::fclose(file);
     _state->read(_produce_idx * sizeof(Record), _onSSD);
     free(buffer);
+    free(_last);
 }
 
 void FileBackedRun::push(Record * other) {
+    other->encodeOVC(_last);
     buffer[_produce_idx % bufSize] = other;
-    free(other);
+    _last = other;
+    // free(other);
     _produce_idx++;
     if (_produce_idx % bufSize == 0) {
         std::fwrite(buffer, sizeof(Record), bufSize, file);
@@ -139,7 +146,7 @@ void FileBackedRun::harden() {
     std::fwrite(buffer, sizeof(Record), _produce_idx % bufSize, file);
     _onSSD = _state->write(_produce_idx * sizeof(Record));
 
-    std::cout << "Wrote " << _produce_idx << " Records to the file\n";
+    // std::cout << "Wrote " << _produce_idx << " Records to the file\n";
     rewind(file);
 }
 
@@ -151,10 +158,9 @@ Record *FileBackedRun::pop() {
     if (_consume_idx < _produce_idx) {
         if (_consume_idx % bufSize == 0) {
             int noRead = fread(buffer, sizeof(Record), bufSize, file);
-            std::cout << "Read " << noRead << " Records from the file\n";
+            // std::cout << "Read " << noRead << " Records from the file\n";
         }
         Record *r =new Record(buffer[_consume_idx % bufSize]);
-        std::cout << "Popped index " << (_consume_idx % bufSize) << *r << "\n";
         _consume_idx++;
         return r;
     } return nullptr;
