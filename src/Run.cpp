@@ -49,9 +49,6 @@ void CacheSizedRun::sort() {
     _records[0].encodeOVC(nullptr);
     for (int i = 1; i < _produce_idx; i++) {
         _records[i].encodeOVC(_records + i - 1);
-        if (i < 10) {
-            std::cout << _records[i] << "\n";
-        }
     }
 }
 

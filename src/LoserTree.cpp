@@ -82,7 +82,6 @@ void LoserTree::replayGame(int idx, int prevWinner) {
 }
 
 void LoserTree::buildTree() {
-    std::cout << "Building Tree with " << _runCount << " runs...\n";
     int* _tmp = (int*) malloc(_runCount * sizeof(int));
     for(int i = 0; i < _runCount; i++) {
         _tmp[i] = i;
@@ -139,15 +138,10 @@ MultiStageLoserTree::MultiStageLoserTree(Run **runs, int count, RunStorageState 
             FileBackedRun *run = new FileBackedRun(state);
             Record *r = tree->next();
             // Temp pointer to enable OVC calculation
-            int i = 0;
             while(r != nullptr) {
                 // Put Record on Run
-                if (i < 10) {
-                    std::cout << "Adding Record to Stack: " << *r << "\n";
-                }
                 run->push(r);
                 r = tree->next();
-                i++;
             }
             // Store the new run
             run->harden();
