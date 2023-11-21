@@ -80,7 +80,7 @@ void testSortIterator(int numRecords) {
     ExternalMergeSortPlan sortPlan(&verifyProducerPlan);
     VerifyOrderPlan validPlan(&sortPlan);
     VerifyContentPlan verifyConsumerPlan(&validPlan, &state, false);
-
+std::cout<<"here bitch=================\n";
     // Initialize SortIterator
     Iterator* sortIt = verifyConsumerPlan.init();
     
