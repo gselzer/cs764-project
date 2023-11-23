@@ -92,7 +92,6 @@ void testSortIterator(int numRecords) {
             break;
         }
         // std::cout << i++ << ": " << *record << "\n";
-        delete record;
     }
     
     delete sortIt;
@@ -173,12 +172,14 @@ void testFileBackedRun(int numRecords) {
 }
 
 int main() {
-    int numRecords = 2 << 14;
-    // testScanIterator(numRecords);
-    testSortIterator(numRecords);
-    // testLoserTree(numRecords);
-    // testRun(numRecords);
-    // testFileBackedRun(numRecords);
+    for (int i = 0; i < 16; i++) {
+        int numRecords = 2 << i;
+        // testScanIterator(numRecords);
+        testSortIterator(numRecords);
+        // testLoserTree(numRecords);
+        // testRun(numRecords);
+        // testFileBackedRun(numRecords);
+    }
     
     std::cout << "All unit tests passed.\n";
     return 0;

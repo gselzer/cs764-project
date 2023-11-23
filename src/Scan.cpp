@@ -4,24 +4,24 @@
 
 ScanPlan::ScanPlan (RowCount const count) : _count (count)
 {
-	TRACE (true);
+	TRACE (false);
 } // ScanPlan::ScanPlan
 
 ScanPlan::~ScanPlan ()
 {
-	TRACE (true);
+	TRACE (false);
 } // ScanPlan::~ScanPlan
 
 Iterator * ScanPlan::init () const
 {
-	TRACE (true);
+	TRACE (false);
 	return new ScanIterator (this);
 } // ScanPlan::init
 
 ScanIterator::ScanIterator (ScanPlan const * const plan) :
 	_plan (plan), _count (0)
 {
-	TRACE (true);
+	TRACE (false);
 	// TODO: Consider random initialization
 	// srand((unsigned) time(NULL));
 
@@ -29,7 +29,7 @@ ScanIterator::ScanIterator (ScanPlan const * const plan) :
 
 ScanIterator::~ScanIterator ()
 {
-	TRACE (true);
+	TRACE (false);
 	traceprintf ("produced %lu of %lu rows\n",
 			(unsigned long) (_count),
 			(unsigned long) (_plan->_count));
@@ -37,7 +37,7 @@ ScanIterator::~ScanIterator ()
 
 Record* ScanIterator::next ()
 {
-    // TRACE (true);
+    TRACE (false);
     if (_count >= _plan->_count) {
         return nullptr; // Stopping condition
     }

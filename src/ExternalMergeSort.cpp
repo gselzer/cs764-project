@@ -57,7 +57,7 @@ ExternalMergeSortIterator::ExternalMergeSortIterator(const ExternalMergeSortPlan
 }
 
 ExternalMergeSortIterator::~ExternalMergeSortIterator() {
-    TRACE(true);
+    TRACE(false);
     delete _input;
     delete _state;
 }

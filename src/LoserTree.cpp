@@ -122,7 +122,6 @@ void LoserTree::printTree(){
 }
 
 MultiStageLoserTree::MultiStageLoserTree(Run **runs, int count, RunStorageState *state): _runs(runs), _count(count){
-
     int _f = 4; // 0.1 * CACHE_SIZE / (RUN_BYTES);
     // Keep going until we only have one run left
     while(_count > 1) {
