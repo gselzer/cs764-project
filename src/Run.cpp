@@ -110,7 +110,11 @@ Record* EmptyRun::pop() {
     return nullptr;
 }
 
-FileBackedRun::FileBackedRun(RunStorageState *state): _produce_idx(0), _consume_idx(0){
+FileBackedRun::FileBackedRun(RunStorageState *state): 
+    _produce_idx(0),
+    _consume_idx(0),
+    _readRemaining(0)
+{
     _last = nullptr;
     _state = state;
     file = std::tmpfile();
@@ -143,27 +147,38 @@ void FileBackedRun::harden() {
     std::fwrite(buffer, sizeof(Record), _produce_idx % bufSize, file);
     _onSSD = _state->write(_produce_idx * sizeof(Record));
 
-    // std::cout << "Wrote " << _produce_idx << " Records to the file\n";
+    std::cout << "Wrote " << _produce_idx << " Records to the file\n";
     rewind(file);
 }
 
 Record *FileBackedRun::peek() {
-    return new Record(buffer[_consume_idx]);
+    if (_consume_idx < _produce_idx) {
+        if (_readRemaining == 0) {
+            _readRemaining += std::fread(buffer, sizeof(Record), bufSize, file);
+            // std::cout << "Consume Index =" << _consume_idx << " - reading in " << _readRemaining << " more rows...\n";
+        }
+        // TODO: We may just want to return the actual pointer, not make a new record
+        Record *r =new Record(buffer[_consume_idx % bufSize]);
+        return r;
+    }
+    return nullptr;
 }
 
 Record *FileBackedRun::pop() {
     if (_consume_idx < _produce_idx) {
-        if (_consume_idx % bufSize == 0) {
-            int noRead = fread(buffer, sizeof(Record), bufSize, file);
-            // std::cout << "Read " << noRead << " Records from the file\n";
+        if (_readRemaining == 0) {
+            _readRemaining += std::fread(buffer, sizeof(Record), bufSize, file);
+            // std::cout << "Consume Index =" << _consume_idx << " - reading in " << _readRemaining << " more rows...\n";
         }
+        // TODO: We may just want to return the actual pointer, not make a new record
         Record *r =new Record(buffer[_consume_idx % bufSize]);
         _consume_idx++;
+        _readRemaining--;
         return r;
     } return nullptr;
 }
 
-RunStorageState::RunStorageState() : _ssdTime(0), _hddTime(0), _ssdAllocated(0), _hddAllocated(0) {
+RunStorageState::RunStorageState() : _ssdAllocated(0), _hddAllocated(0), _ssdTime(0), _hddTime(0) {
 }
 
 RunStorageState::~RunStorageState() {

@@ -32,6 +32,8 @@ Record &Record::operator=(const Record &that) {
 
 	this->_offset = that._offset;
 	this->_value = that._value;
+
+	return *this;
 }
 
 bool Record::operator==(Record that) {

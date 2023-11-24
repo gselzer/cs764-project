@@ -45,10 +45,12 @@ class RunStorageState
 	const float _hdd_latency = 0.01; // 10 ms
 	const int _ssd_bandwidth = 100 * (2 << 19); // 100 MB/s
 	const int _hdd_bandwidth = 100 * (2 << 19); // 100 MB/s
-	const uint64_t _ssd_size = 10 * (2 << 29); // 10 GB
+	const uint64_t _ssd_size = ((uint64_t) 10 )* (2 << 29); // 10 GB
 
-	int _ssdAllocated, _hddAllocated;
-	float _ssdTime, _hddTime;
+	int _ssdAllocated;
+    int _hddAllocated;
+	float _ssdTime;
+    float _hddTime;
 };
 
 class FileBackedRun: public Run {
@@ -64,6 +66,7 @@ private:
     Record *buffer;
     int _produce_idx;
     int _consume_idx;
+    int _readRemaining;
     Record *_last;
     RunStorageState *_state;
     bool _onSSD; 

@@ -23,6 +23,7 @@ public:
 private:
 	VerifyOrderPlan const * const _plan;
 	Iterator * const _input;
-	RowCount _consumed, _produced;
+	RowCount _consumed;
+	RowCount _produced;
 	Record *_last;
 }; // class VerifyOrderIterator

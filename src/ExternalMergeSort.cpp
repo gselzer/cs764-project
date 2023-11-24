@@ -27,7 +27,7 @@ ExternalMergeSortIterator::ExternalMergeSortIterator(const ExternalMergeSortPlan
     while (r != nullptr) {
         CacheSizedRun *run = new CacheSizedRun();
         // Fill in the run array
-        for (int i = 0; i < RUN_RECORDS; i++) {
+        for (uint64_t i = 0; i < RUN_RECORDS; i++) {
             run->push(r);
             r = _input->next();
         }

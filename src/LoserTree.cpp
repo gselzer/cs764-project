@@ -153,7 +153,7 @@ MultiStageLoserTree::MultiStageLoserTree(Run **runs, int count, RunStorageState 
             _readIdx += numRuns;
             // Update count - we removed numRuns runs, but added one more.
         }
-        _count -= (_storeIdx * (_f - 1));
+        _count = _storeIdx;
     }
 }
 

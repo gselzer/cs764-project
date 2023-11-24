@@ -23,8 +23,8 @@ Iterator * VerifyOrderPlan::init () const
 VerifyOrderIterator::VerifyOrderIterator (VerifyOrderPlan const * const plan) :
 	_plan (plan),
 	_input (_plan->_input->init()),
-	_produced (0),
-	_consumed (0)
+	_consumed (0),
+	_produced (0)
 {
 	TRACE (false);
 	int min = std::numeric_limits<int>::min();
