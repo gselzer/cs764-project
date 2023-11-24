@@ -43,14 +43,7 @@ ExternalMergeSortIterator::ExternalMergeSortIterator(const ExternalMergeSortPlan
     }
     
     // Step 2.2: Build a Run[]
-    if (records.size() * RUN_BYTES > CACHE_SIZE) {
-        
-        _tree = new LoserTree(runArray, records.size());
-    }
-    else {
-        _tree = new MultiStageLoserTree(runArray, records.size(), _state);
-    }
-
+    _tree = new MultiStageLoserTree(runArray, records.size(), _state);
 
     // records.clear();
     // delete runArray;

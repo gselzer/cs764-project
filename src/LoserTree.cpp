@@ -93,11 +93,15 @@ void LoserTree::buildTree() {
             Record *r1 = _runs[idx1]->peek();
             Record *r2 = _runs[idx2]->peek();
             if (r2 == nullptr || (r1 != nullptr && r1->leOVC(r2))) {
-                r2->encodeOVC(r1);
+                if (r2 != nullptr) {
+                    r2->encodeOVC(r1);
+                }
                 _tree[half + i] = idx2;
                 _tmp[i] = idx1;
             } else {
-                r1->encodeOVC(r2);
+                if (r1 != nullptr) {
+                    r1->encodeOVC(r2);
+                }
                 _tree[half + i] = idx1;
                 _tmp[i] = idx2;
             }
