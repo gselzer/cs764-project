@@ -2,7 +2,15 @@
 #include <iostream>
 #include <ostream>
 
-Record::Record(Record *other) : row1(other->row1), row2(other->row2), row3(other->row3), _offset(other->_offset), _value(other->_value) {
+Record::Record(Record *other) {
+	 if (other == nullptr) {
+        throw std::invalid_argument("Null pointer passed to Record copy constructor");
+    }
+	row1 = other->row1;
+    row2 = other->row2;
+    row3 = other->row3;
+    _offset = other->_offset;
+    _value = other->_value;
 	TRACE(false);
 }
 
