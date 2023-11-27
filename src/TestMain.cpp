@@ -172,7 +172,7 @@ void testFileBackedRun(int numRecords) {
 }
 
 int main() {
-    for (int i = 0; i < 23; i++) {
+    for (int i = 0; i < 24; i++) {
         int numRecords = 2 << i;
         // testScanIterator(numRecords);
         testSortIterator(numRecords);
