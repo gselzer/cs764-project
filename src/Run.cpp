@@ -129,10 +129,8 @@ FileBackedRun::~FileBackedRun() {
 }
 
 void FileBackedRun::push(Record * other) {
-    other->encodeOVC(_last);
     buffer[_produce_idx % bufSize] = other;
     _last = other;
-    // free(other);
     _produce_idx++;
     if (_produce_idx % bufSize == 0) {
         std::fwrite(buffer, sizeof(Record), bufSize, file);
@@ -155,11 +153,8 @@ Record *FileBackedRun::peek() {
     if (_consume_idx < _produce_idx) {
         if (_readRemaining == 0) {
             _readRemaining += std::fread(buffer, sizeof(Record), bufSize, file);
-            // std::cout << "Consume Index =" << _consume_idx << " - reading in " << _readRemaining << " more rows...\n";
         }
-        // TODO: We may just want to return the actual pointer, not make a new record
-        Record *r =new Record(buffer[_consume_idx % bufSize]);
-        return r;
+        return buffer + (_consume_idx % bufSize);
     }
     return nullptr;
 }

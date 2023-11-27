@@ -65,13 +65,13 @@ void LoserTree::replayGame(int idx, int prevWinner) {
         winner = prevLoser;
         loser = prevWinner;
     } else if (rl->leOVC(rw)) {
-        // std::cout << "Index " << prevLoser << " beat out Index " <<  prevWinner << "\n";
+        // std::cout << "Previous Loser " << *rl << " beat out Previous Winner " <<  *rw << "\n";
         rw->encodeOVC(rl);
         winner = prevLoser;
         loser = prevWinner;
 
     } else {
-        // std::cout << "Index " << prevWinner << " beat out Index " <<  prevLoser << "\n";
+        // std::cout << "Previous Winner " << *rw << " beat out Previous Loser " <<  *rl << "\n";
         rl->encodeOVC(rw);
         winner = prevWinner;
         loser = prevLoser;
