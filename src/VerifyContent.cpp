@@ -12,8 +12,8 @@ VerifyContentState::VerifyContentState() : _diffSeen(0)
 
 VerifyContentState::~VerifyContentState()
 {
-	free(_diff);
-	free(_noDiff);
+	delete _diff;
+	delete _noDiff;
 }
 
 void VerifyContentState::incrementDiff(Record *r) {

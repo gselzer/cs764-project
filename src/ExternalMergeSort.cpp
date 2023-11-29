@@ -38,25 +38,13 @@ ExternalMergeSortIterator::ExternalMergeSortIterator(const ExternalMergeSortPlan
     } 
     _tree->reduce();
     
-    
-    // Step 2: Build the Loser Tree
-    // Step 2.1: Obtain a run array that is a power of 2
-    Run ** runArray = (Run**) malloc(records.size() * sizeof(Run*));
-    for(size_t i = 0; i < records.size(); i++) {
-        runArray[i] = records[i];
-    }
-    
-    // Step 2.2: Build a Run[]
-    
-
-    // records.clear();
-    // delete runArray;
 }
 
 ExternalMergeSortIterator::~ExternalMergeSortIterator() {
     TRACE(false);
     delete _input;
     delete _state;
+    delete _tree;
 }
 
 Record* ExternalMergeSortIterator::next() {

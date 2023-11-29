@@ -9,7 +9,7 @@ CacheSizedRun::CacheSizedRun(): _produce_idx(0), _consume_idx(0) {
 void CacheSizedRun::push(Record * record) {
     if (record != nullptr) {
         _records[_produce_idx++] = *record;
-        free(record);
+        delete record;
     }
 }
 
@@ -165,8 +165,7 @@ Record *FileBackedRun::pop() {
             _readRemaining += std::fread(buffer, sizeof(Record), bufSize, file);
             // std::cout << "Consume Index =" << _consume_idx << " - reading in " << _readRemaining << " more rows...\n";
         }
-        // TODO: We may just want to return the actual pointer, not make a new record
-        Record *r =new Record(buffer[_consume_idx % bufSize]);
+        Record *r = buffer + (_consume_idx % bufSize);
         _consume_idx++;
         _readRemaining--;
         return r;

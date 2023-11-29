@@ -173,7 +173,7 @@ void testFileBackedRun(int numRecords) {
 }
 
 int main() {
-    for (uint64_t i = 27; i < 31; i++) {
+    for (uint64_t i = 10; i < 11; i++) {
         RowCount numRecords = 2 ;
         numRecords = numRecords << i;
         // testScanIterator(numRecords);
