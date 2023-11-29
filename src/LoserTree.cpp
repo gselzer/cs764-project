@@ -4,16 +4,25 @@
 #include <stdlib.h>
 #include <cstring>
 #include <iostream>
+#include <vector>
 
-LoserTree::LoserTree(Run **runs, int runCount){
+LoserTree::LoserTree(std::vector<Run*>cacheOfRuns, int runCount){
     // Set up runs array (array of Run pointers)
     _runCount = runCount;
+    //    std::cout << "Run Count: " << _runCount << "\n";
     while(!IsPowerOf2(_runCount)) {
         _runCount++;
     }
+    //    std::cout << "Run Count: " << _runCount << "\n";
     _runs = (Run **) malloc(_runCount * sizeof(Run *));
-    std::memcpy(_runs, runs, runCount * sizeof(Run *));
+    // std::memcpy(_runs, runs, runCount * sizeof(Run *));
+    for(int i =0;i<runCount;i++){
+        _runs[i] = cacheOfRuns[i];
+        
+    }
+    
     for(int i = runCount; i < _runCount; i++) {
+        // std::cout << "Run Count: " << _runCount << "\n";
         _runs[i] = new EmptyRun();
     }
     // Set up tree data structure
@@ -125,8 +134,34 @@ void LoserTree::printTree(){
     std::cout << "]\n";
 }
 
-MultiStageLoserTree::MultiStageLoserTree(Run **runs, int count, RunStorageState *state): _runs(runs), _count(count){
-    int _f = 0.9 * CACHE_SIZE / (RUN_BYTES);
+MultiStageLoserTree::MultiStageLoserTree(RunStorageState *state){
+    int _f = 0.9 * CACHE_SIZE / (RUN_BYTES);\
+    _state = state;
+    
+}
+
+MultiStageLoserTree::~MultiStageLoserTree() {
+
+}
+
+Record *MultiStageLoserTree::next() {
+    return _fileBackedRuns[0]->pop();
+}
+
+void MultiStageLoserTree::append(CacheSizedRun *run ) {
+    float _fanOut = 0.9 * CACHE_SIZE / (RUN_BYTES);
+    _cacheOfRuns.push_back(run);
+    if(_cacheOfRuns.size()>_fanOut){
+        flushCacheRuns();
+    }
+    
+}
+
+void MultiStageLoserTree::reduce() {
+    if(_cacheOfRuns.size()>0){
+        flushCacheRuns();
+    }
+    int _count = _fileBackedRuns.size();
     while(_count > 1) {
         int _storeIdx = 0;
         int _readIdx = 0;
@@ -134,10 +169,11 @@ MultiStageLoserTree::MultiStageLoserTree(Run **runs, int count, RunStorageState 
         while(_readIdx < _count) {
             // Construct a Loser Tree on _f consecutive runs
             int remainingRuns = _count - _readIdx;
-            int numRuns = _f < remainingRuns ? _f : remainingRuns;
-            LoserTree *tree = new LoserTree(_runs + _readIdx, numRuns);
+            int numRuns = _fanOut < remainingRuns ? _fanOut : remainingRuns;
+
+            LoserTree *tree = new LoserTree(_fileBackedRuns, numRuns);
             // Read out the sorted results to a file-backed run
-            FileBackedRun *run = new FileBackedRun(state);
+            FileBackedRun *run = new FileBackedRun(_state);
             Record *r = tree->next();
             // Temp pointer to enable OVC calculation
             while(r != nullptr) {
@@ -147,19 +183,31 @@ MultiStageLoserTree::MultiStageLoserTree(Run **runs, int count, RunStorageState 
             }
             // Store the new run
             run->harden();
-            _runs[_storeIdx++] = run;
+            _fileBackedRuns[_storeIdx++] = run;
             // Increment readIdx
             _readIdx += numRuns;
             // Update count - we removed numRuns runs, but added one more.
         }
         _count = _storeIdx;
-    }
+    } 
 }
 
-MultiStageLoserTree::~MultiStageLoserTree() {
+void MultiStageLoserTree::flushCacheRuns(){
+    LoserTree *tree = new LoserTree(_cacheOfRuns, _cacheOfRuns.size());
+            // Read out the sorted results to a file-backed run
+            FileBackedRun *run = new FileBackedRun(_state);
+            Record *r = tree->next();
+            // Temp pointer to enable OVC calculation
+            while(r != nullptr) {
+                // Put Record on Run
+                // std::cout<<*r<<"\n";
+                run->push(r);
+                r = tree->next();
+            }
+            //store the FileBackedRun in the Vector
+            run->harden();
+            _fileBackedRuns.push_back(run);
+            //clear the cacheOfRuns
+            _cacheOfRuns.clear();
 
-}
-
-Record *MultiStageLoserTree::next() {
-    return _runs[0]->pop();
 }

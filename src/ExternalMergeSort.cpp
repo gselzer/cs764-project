@@ -20,6 +20,7 @@ ExternalMergeSortIterator::ExternalMergeSortIterator(const ExternalMergeSortPlan
       _currentIdx(0)
 {
     _state = new RunStorageState();
+    _tree = new MultiStageLoserTree(_state);
     // Step 1: Create Runs
     std::vector<Run*> records;
     Record *r;
@@ -32,8 +33,11 @@ ExternalMergeSortIterator::ExternalMergeSortIterator(const ExternalMergeSortPlan
             r = _input->next();
         }
         run->sort();
-        records.push_back(run);
+        // records.push_back(run);
+        _tree->append(run);
     } 
+    _tree->reduce();
+    
     
     // Step 2: Build the Loser Tree
     // Step 2.1: Obtain a run array that is a power of 2
@@ -43,7 +47,7 @@ ExternalMergeSortIterator::ExternalMergeSortIterator(const ExternalMergeSortPlan
     }
     
     // Step 2.2: Build a Run[]
-    _tree = new MultiStageLoserTree(runArray, records.size(), _state);
+    
 
     // records.clear();
     // delete runArray;
@@ -58,3 +62,5 @@ ExternalMergeSortIterator::~ExternalMergeSortIterator() {
 Record* ExternalMergeSortIterator::next() {
     return _tree->next();
 }
+
+

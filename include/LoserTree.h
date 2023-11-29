@@ -3,12 +3,13 @@
 #include "Record.h"
 #include "Run.h"
 #include "Tree.h"
+#include <vector>
 
 class LoserTree: public Tree
 {
 	friend class ExternalMergeSortIterator;
 public:
-    LoserTree(Run **runs, int runCount);
+    LoserTree(std::vector<Run*>cacheOfRuns, int runCount);
     ~LoserTree();
     Record* next();
 private:
@@ -24,10 +25,16 @@ class MultiStageLoserTree: public Tree
 {
 	friend class ExternalMergeSortIterator;
 public:
-    MultiStageLoserTree(Run **runs, int runCount, RunStorageState *state);
+    MultiStageLoserTree(RunStorageState *state);
     ~MultiStageLoserTree();
     Record* next();
+    void append(CacheSizedRun *run);
+    void reduce();
+    void flushCacheRuns();
+
 private:
-    Run **_runs;
-    int _count;
+    float _fanOut = 0.9 * CACHE_SIZE / (RUN_BYTES);
+    std::vector <Run*> _cacheOfRuns;
+    std::vector <Run *> _fileBackedRuns;
+    RunStorageState *_state;
 }; // class LoserTree

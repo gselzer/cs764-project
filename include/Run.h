@@ -51,6 +51,7 @@ class RunStorageState
     int _hddAllocated;
 	float _ssdTime;
     float _hddTime;
+    
 };
 
 class FileBackedRun: public Run {
