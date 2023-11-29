@@ -27,7 +27,7 @@ void testScanIterator(int numRecords) {
         assert(record->row1 >= 0 && record->row2 >= 0);
         ++count;
     }
-    assert(count == 10);  // Assuming we generated 10 records
+    assert(count == numRecords);  // Assuming we generated 10 records
     
     delete scanIt;
     
@@ -67,7 +67,7 @@ void testVerifyContentIterator(int numRecords) {
     std::cout << "SortIterator tests passed.\n";
 }
 
-void testSortIterator(int numRecords) {
+void testSortIterator(RowCount numRecords) {
     std::cout << "Running SortIterator tests...\n";
     
     // Manually creating some records for testing
@@ -89,6 +89,7 @@ void testSortIterator(int numRecords) {
     while (true) {
         Record* record = sortIt->next();
         if (record == nullptr) {
+            std::cout << "Done! No More Records.\n";
             break;
         }
         // std::cout << i++ << ": " << *record << "\n";
@@ -172,9 +173,11 @@ void testFileBackedRun(int numRecords) {
 }
 
 int main() {
-    for (int i = 0; i < 24; i++) {
-        int numRecords = 2 << i;
+    for (uint64_t i = 30; i < 31; i++) {
+        RowCount numRecords = 2 ;
+        numRecords = numRecords << i;
         // testScanIterator(numRecords);
+        // std::cout << "Testing with " << numRecords << " records\n";
         testSortIterator(numRecords);
         // testLoserTree(numRecords);
         // testRun(numRecords);
