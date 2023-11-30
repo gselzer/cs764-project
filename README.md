@@ -1,6 +1,6 @@
 # README - CS 764 Semester Project - Team 4
 * Gabriel Selzer - 9076571836
-* Nitigya Kargeti
+* Nitigya Kargeti - 9086226645
 * RAFAEL VINCENTY-VARGAS
 * SWEKSHA SHUKLA
 
