@@ -1,5 +1,5 @@
 **/*.o 
 **/*.exe
 .DS_Store
-
+trace0.txt
 .vscode/

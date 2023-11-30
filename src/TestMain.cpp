@@ -10,6 +10,9 @@
 #include <iostream>
 #include <cassert>
 #include <vector>
+#include <getopt.h>
+#include <filesystem>
+#include <fstream>
 
 void testScanIterator(int numRecords) {
     std::cout << "Running ScanIterator tests...\n";
@@ -92,7 +95,7 @@ void testSortIterator(RowCount numRecords) {
             std::cout << "Done! No More Records.\n";
             break;
         }
-        // std::cout << i++ << ": " << *record << "\n";
+        std::cout << i++ << ": " << *record << "\n";
     }
     
     delete sortIt;
@@ -172,18 +175,59 @@ void testFileBackedRun(int numRecords) {
     free(state);
 }
 
-int main() {
-    for (uint64_t i = 27; i < 31; i++) {
-        RowCount numRecords = 2 ;
-        numRecords = numRecords << i;
+int main(int argc, char *argv[]) {
+  
+    RowCount numRecords = 0;
+    size_t recordSize = 0;
+    std::string traceFile;
+
+    int option;
+    while ((option = getopt(argc, argv, "c:s:o:")) != -1) {
+        switch (option) {
+            case 'c':
+                numRecords = std::stoull(optarg);
+                break;
+            case 's':
+                recordSize = static_cast<size_t>(std::stoul(optarg));
+                break;
+            case 'o':
+                traceFile = optarg;
+                break;
+            default:
+                std::cerr << "Usage: " << argv[0] << " -c numRecords -s recordSize -o traceFile\n";
+                return 1;
+        }
+    }
+
+    
+    if (numRecords == 0 || recordSize == 0 || traceFile.empty()) {
+        std::cerr << "Invalid arguments\n";
+        return 1;
+    }
+
         // testScanIterator(numRecords);
-        // std::cout << "Testing with " << numRecords << " records\n";
-        testSortIterator(numRecords);
         // testLoserTree(numRecords);
         // testRun(numRecords);
         // testFileBackedRun(numRecords);
-    }
     
+    
+ // Output to trace file
+
+    std::ofstream traceOut(traceFile);
+    testSortIterator(numRecords);
+    
+    if (traceOut.is_open()) {
+        traceOut << "Memory access sizes and latencies\n";
+        // Log actual data
+        
+        traceOut.close();
+    } else {
+        std::cerr << "Failed to open trace file: " << traceFile << "\n";
+    }
+
     std::cout << "All unit tests passed.\n";
     return 0;
+ 
+    return 0;
 }
+
