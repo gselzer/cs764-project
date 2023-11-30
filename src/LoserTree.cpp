@@ -33,7 +33,7 @@ LoserTree::LoserTree(std::vector<Run*>cacheOfRuns, int runCount){
 
 LoserTree::~LoserTree() {
     for(int i = 0; i < _runCount; i++) {
-        free(_runs[i]);
+        delete _runs[i];
     }
     free(_runs);
     free(_tree);
@@ -134,10 +134,7 @@ void LoserTree::printTree(){
     std::cout << "]\n";
 }
 
-MultiStageLoserTree::MultiStageLoserTree(RunStorageState *state){
-    int _f = 0.9 * CACHE_SIZE / (RUN_BYTES);\
-    _state = state;
-    
+MultiStageLoserTree::MultiStageLoserTree(RunStorageState *state): _state(state){
 }
 
 MultiStageLoserTree::~MultiStageLoserTree() {
@@ -158,6 +155,7 @@ void MultiStageLoserTree::append(CacheSizedRun *run ) {
 }
 
 void MultiStageLoserTree::reduce() {
+    // TODO: Delete all of the old runs!
     if(_cacheOfRuns.size()>0){
         flushCacheRuns();
     }
@@ -194,20 +192,21 @@ void MultiStageLoserTree::reduce() {
 
 void MultiStageLoserTree::flushCacheRuns(){
     LoserTree *tree = new LoserTree(_cacheOfRuns, _cacheOfRuns.size());
-            // Read out the sorted results to a file-backed run
-            FileBackedRun *run = new FileBackedRun(_state);
-            Record *r = tree->next();
-            // Temp pointer to enable OVC calculation
-            while(r != nullptr) {
-                // Put Record on Run
-                // std::cout<<*r<<"\n";
-                run->push(r);
-                r = tree->next();
-            }
-            //store the FileBackedRun in the Vector
-            run->harden();
-            _fileBackedRuns.push_back(run);
-            //clear the cacheOfRuns
-            _cacheOfRuns.clear();
+    // Read out the sorted results to a file-backed run
+    FileBackedRun *run = new FileBackedRun(_state);
+    Record *r = tree->next();
+    // Temp pointer to enable OVC calculation
+    while(r != nullptr) {
+        // Put Record on Run
+        // std::cout<<*r<<"\n";
+        run->push(r);
+        r = tree->next();
+    }
+    //store the FileBackedRun in the Vector
+    run->harden();
+    _fileBackedRuns.push_back(run);
 
+    _cacheOfRuns.clear();
+
+    delete tree;
 }
