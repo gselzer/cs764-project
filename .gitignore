@@ -3,3 +3,6 @@
 .DS_Store
 trace0.txt
 .vscode/
+
+# test.sh output file
+test.txt
