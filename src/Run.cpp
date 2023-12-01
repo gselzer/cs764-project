@@ -72,53 +72,6 @@ int CacheSizedRun::partition(int low, int high) {
     return i + 1;
 }
 
-
-// Merge function for merge sort
-void CacheSizedRun::merge(int l, int m, int r) {
-    int n1 = m - l + 1;
-    int n2 = r - m;
-
-    // TODO: Don't malloc every time - malloc once at the beginning of the sort call
-    Record * L = (Record *)malloc(n1 * sizeof(Record));
-    Record * R = (Record *)malloc(n2 * sizeof(Record));
-    
-    for (int i = 0; i < n1; i++)
-        L[i] = _records[l + i];
-    for (int j = 0; j < n2; j++)
-        R[j] = _records[m + 1 + j];
-
-    int i = 0;
-    int j = 0;
-    int k = l;
-
-    while (i < n1 && j < n2) {
-        if (L[i] <= R[j]) {
-            _records[k] = L[i];
-            i++;
-        }
-        else {
-            _records[k] = R[j];
-            j++;
-        }
-        k++;
-    }
-
-    while (i < n1) {
-        _records[k] = L[i];
-        i++;
-        k++;
-    }
-
-    while (j < n2) {
-        _records[k] = R[j];
-        j++;
-        k++;
-    }
-
-    free(L);
-    free(R);
-}
-
 void EmptyRun::push(Record *) {
     //nop
 }
