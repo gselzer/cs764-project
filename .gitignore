@@ -6,3 +6,6 @@ trace0.txt
 
 # test.sh output file
 test.txt
+
+# Executable
+sort

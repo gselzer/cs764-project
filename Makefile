@@ -9,17 +9,17 @@ SCRS=
 # headers and code sources with updated paths
 HDRS=	include/defs.h \
 		include/Iterator.h include/Scan.h include/Filter.h include/Sort.h include/Record.h include/Run.h include/VerifyOrder.h include/LoserTree.h include/ExternalMergeSort.h include/VerifyContent.h
-SRCS=	src/defs.cpp src/Assert.cpp src/Test.cpp src/TestMain.cpp \
+SRCS=	src/defs.cpp src/Assert.cpp src/Test.cpp src/Main.cpp \
 		src/Iterator.cpp src/Scan.cpp src/Filter.cpp src/Sort.cpp src/Record.cpp src/Run.cpp src/VerifyOrder.cpp src/LoserTree.cpp src/ExternalMergeSort.cpp src/VerifyContent.cpp
 
 # compilation targets
-OBJS=	defs.o Assert.o Test.o TestMain.o \
+OBJS=	defs.o Assert.o Test.o Main.o \
 		Iterator.o Scan.o Filter.o Sort.o Record.o Run.o VerifyOrder.o LoserTree.o ExternalMergeSort.o VerifyContent.o
 
 # default target
-Test.exe : $(OBJS)
+sort : $(OBJS)
 	@echo "Linking $@"
-	g++ $(CPPFLAGS) -o Test.exe $(OBJS)
+	g++ $(CPPFLAGS) -o sort $(OBJS)
 
 # To generate each object file
 %.o : src/%.cpp
@@ -27,10 +27,10 @@ Test.exe : $(OBJS)
 	g++ $(CPPFLAGS) -c $< -o $@
 
 # other rules
-trace : Test.exe
+trace : sort
 	@date > trace
-	./Test.exe >> trace
-	@size -t Test.exe $(OBJS) | sort -r >> trace
+	./sort >> trace
+	@size -t sort $(OBJS) | sort -r >> trace
 
 list :
 	echo Makefile $(HDRS) $(SRCS) $(DOCS) $(SCRS) > list
@@ -39,4 +39,4 @@ count : list
 	@wc `cat list`
 
 clean :
-	@rm -f $(OBJS) Test.exe Test.exe.stackdump trace
+	@rm -f $(OBJS) sort sort.stackdump trace

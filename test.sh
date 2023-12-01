@@ -7,5 +7,5 @@ make clean
 make
 for ((i=$START; i<=$END; i++))
 do
-  ./Test.exe -c $((2**$i)) -s 1000 -o test.txt
+  ./sort -c $((2**$i)) -s 1000 -o test.txt
 done
