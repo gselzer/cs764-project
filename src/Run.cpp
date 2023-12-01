@@ -37,20 +37,41 @@ void CacheSizedRun::sort() {
     if (_produce_idx < 2) {
         return;
     }
-    // Step 1: Internal Merge Sort
-    for (int curr_size = 1; curr_size <= n - 1; curr_size = 2 * curr_size) {
-        for (int left_start = 0; left_start < n - 1; left_start += 2 * curr_size) {
-            int mid = std::min(left_start + curr_size - 1, n - 1);
-            int right_end = std::min(left_start + 2 * curr_size - 1, n - 1);
-            merge(left_start, mid, right_end);
-        }
-    }
+    
+    // Declare the quicksort function
+
+    quicksort(0, n - 1);
+
     // Step 2: Encode offset value
     _records[0].encodeOVC(nullptr);
     for (int i = 1; i < _produce_idx; i++) {
         _records[i].encodeOVC(_records + i - 1);
     }
 }
+
+void CacheSizedRun::quicksort(int low, int high) {
+    if (low < high) {
+        int pivot = partition(low, high);
+        quicksort(low, pivot - 1);
+        quicksort(pivot + 1, high);
+    }
+}
+
+int CacheSizedRun::partition(int low, int high) {
+    Record pivot = _records[high];
+    int i = low - 1;
+
+    for (int j = low; j < high; j++) {
+        if (_records[j] <= pivot) {
+            i++;
+            std::swap(_records[i], _records[j]);
+        }
+    }
+
+    std::swap(_records[i + 1], _records[high]);
+    return i + 1;
+}
+
 
 // Merge function for merge sort
 void CacheSizedRun::merge(int l, int m, int r) {
