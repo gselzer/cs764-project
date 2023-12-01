@@ -26,6 +26,8 @@ public:
     Record* pop();
 private:
     void merge(int l, int m, int r);
+    void quicksort(int low, int high);
+    int partition(int low,int high);
     Record *_records;
     int _produce_idx;
     int _consume_idx;

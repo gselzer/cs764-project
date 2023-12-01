@@ -2,13 +2,17 @@
 * Gabriel Selzer - 9076571836
 * Nitigya Kargeti - 9086226645
 * Rafael Vincenty-Vargas - 9086209146
-* SWEKSHA SHUKLA
+* Sweksha Shukla - 9083762790
 
 ## Techniques Implemented & Group Contributions
 
 ### CPU Cache Merge Sort - Implemented by Nitigya
 
 The implementation can be found in Run.cpp, on line X. The CPU Cache Merge sort sorts groups of Records such that the total number of bytes in the sort fits within the CPU Cache. We specifically use less space than the given amount to leave space for e.g. Instructions, other objects, etc.
+
+### Quicksort - Implemented by Rafael and Sweksha
+
+This implementation can be found in Run.cpp.
 
 ### Tournament Trees - Implemented by Gabe
 
@@ -37,7 +41,7 @@ Spilling from Memory to SSD can be found in LoserTree, within the MultiStageLose
 File Backed Runs are used to spill to both SSD and HDD - in practice, they write to and read from a std::tmpfile. Because we cannot actually decide whether we physically spill to SSD or HDD, each edits a shared state, which virtually keeps track of how many spilled to each device. The logic for spilling is simple - if there’s room for a run on SSD, it goes there. Otherwise, we spill to HDD.
 
 ### Minimum Count of Row & Column Comparisons
-This requirement is satisfied by the use of Offset Value Coding within the Tournament Trees, which was shown in class to guarantee a bounded number of row & column comparisons. Please see those sections for their locations.
+This requirement is satisfied by the use of Offset Value Coding within the Tournament Trees, which was shown in class to guarantee a bounded number of row & column comparisons. Please see those sections for their locations. 
 
 ## Writeup:
 
