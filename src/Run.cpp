@@ -42,10 +42,6 @@ CacheSizedRun::~CacheSizedRun() {
     free(_records);   
 } 
 
-/**CacheSizedRun::~CacheSizedRun() {
-    free(_records);   
-}**/
-
 void CacheSizedRun::sort() {
     std::cout<<"Sorting "<<_produce_idx<<" records\n";
     int n = _produce_idx;
