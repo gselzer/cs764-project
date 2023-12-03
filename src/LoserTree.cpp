@@ -29,7 +29,7 @@ LoserTree::LoserTree(std::vector<Run*>cacheOfRuns, int runCount){
     _tree = (int*) malloc(_runCount * sizeof(int));
     // Build the Tree
     buildTree();
-};
+}
 
 LoserTree::~LoserTree() {
     for(int i = 0; i < _runCount; i++) {
@@ -138,7 +138,7 @@ MultiStageLoserTree::MultiStageLoserTree(RunStorageState *state): _state(state){
 }
 
 MultiStageLoserTree::~MultiStageLoserTree() {
-
+    _fileBackedRuns.clear();
 }
 
 Record *MultiStageLoserTree::next() {
@@ -185,6 +185,7 @@ void MultiStageLoserTree::reduce() {
             // Increment readIdx
             _readIdx += numRuns;
             // Update count - we removed numRuns runs, but added one more.
+            delete tree;
         }
         _count = _storeIdx;
     } 

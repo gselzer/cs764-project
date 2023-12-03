@@ -4,6 +4,7 @@
 
 class Run {
 public:
+    virtual ~Run() {};
     virtual void push(Record *) = 0;
     virtual Record* peek() = 0;
     virtual Record* pop() = 0;
