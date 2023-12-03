@@ -89,7 +89,7 @@ FileBackedRun::FileBackedRun(RunStorageState *state):
     _consume_idx(0),
     _readRemaining(0)
 {
-    _last = nullptr;
+    _last = new Record(0, 0, 0);
     _state = state;
     file = std::tmpfile();
     buffer = (Record *) malloc(PAGE_SIZE);
@@ -99,12 +99,11 @@ FileBackedRun::~FileBackedRun() {
     std::fclose(file);
     _state->read(_produce_idx * sizeof(Record), _onSSD);
     free(buffer);
-    free(_last);
+    delete _last;
 }
 
 void FileBackedRun::push(Record * other) {
     buffer[_produce_idx % bufSize] = other;
-    _last = other;
     _produce_idx++;
     if (_produce_idx % bufSize == 0) {
         std::fwrite(buffer, sizeof(Record), bufSize, file);
@@ -139,10 +138,10 @@ Record *FileBackedRun::pop() {
             _readRemaining += std::fread(buffer, sizeof(Record), bufSize, file);
             // std::cout << "Consume Index =" << _consume_idx << " - reading in " << _readRemaining << " more rows...\n";
         }
-        Record *r = buffer + (_consume_idx % bufSize);
+        *_last = (buffer + (_consume_idx % bufSize));
         _consume_idx++;
         _readRemaining--;
-        return r;
+        return _last;
     } return nullptr;
 }
 
