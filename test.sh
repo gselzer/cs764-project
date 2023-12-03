@@ -1,11 +1,12 @@
 # Starting and stopping Powers of 2
 
-START=10
-END=11
+START=0
+END=22
 
 make clean
 make
-for ((i=$START; i<=$END; i++))
+for i in `seq $START $END`;
 do
-  ./sort -c $((2**$i)) -s 1000 -o test.txt
+  NUM_RECORDS=$(echo "2 ^ $i" | bc)
+  ./sort -c $NUM_RECORDS -s 1000 -o test.txt
 done
