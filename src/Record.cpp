@@ -6,16 +6,16 @@ Record::Record(Record *other) {
 	 if (other == nullptr) {
         throw std::invalid_argument("Null pointer passed to Record copy constructor");
     }
-	row1 = other->row1;
-    row2 = other->row2;
-    row3 = other->row3;
+	char *row1 = other->row1;
+    char *row2 = other->row2;
+    char *row3 = other->row3;
     _offset = other->_offset;
     _value = other->_value;
 	TRACE(false);
 }
 
 // Constructor
-Record::Record(int r1, int r2, int r3) : row1(r1), row2(r2), row3(r3), _offset(-1), _value(-1) {
+Record::Record(char *r1, char *r2, char *r3) : row1(r1), row2(r2), row3(r3), _offset(-1), _value(-1) {
 	TRACE(false);
 }
 
