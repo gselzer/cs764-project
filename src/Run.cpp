@@ -32,6 +32,7 @@ CacheSizedRun::~CacheSizedRun() {
 }
 
 void CacheSizedRun::sort() {
+    std::cout<<"Sorting "<<_produce_idx<<" records\n";
     int n = _produce_idx;
     // We're already sorted if we have 0 or 1 elements
     if (_produce_idx < 2) {
@@ -157,6 +158,7 @@ RunStorageState::~RunStorageState() {
 bool RunStorageState::write(const int noBytes) {
     if (_ssd_size - _ssdAllocated > 0) {
         // Write out to SSD
+        std::cout << "Writing " << noBytes << " bytes to SSD\n";
         float transferTime = ((double) noBytes) / _ssd_bandwidth;
         _ssdTime += _ssd_latency + transferTime;
 
@@ -165,6 +167,7 @@ bool RunStorageState::write(const int noBytes) {
     }
     else {
         // Write out to HDD
+        std::cout << "Writing " << noBytes << " bytes to HDD\n";    
         float transferTime = ((double) noBytes) / _hdd_bandwidth;
         _hddTime += _hdd_latency + transferTime;
 
@@ -176,6 +179,7 @@ bool RunStorageState::write(const int noBytes) {
 void RunStorageState::read(const int noBytes, const bool readFromSSD) {
     if (readFromSSD) {
         // Write out to SSD
+        std::cout << "Reading " << noBytes << " bytes from SSD\n";
         float transferTime = ((double) noBytes) / _ssd_bandwidth;
         _ssdTime += _ssd_latency + transferTime;
 
@@ -183,6 +187,7 @@ void RunStorageState::read(const int noBytes, const bool readFromSSD) {
     }
     else {
         // Write out to HDD
+        std::cout << "Reading " << noBytes << " bytes from HDD\n";
         float transferTime = ((double) noBytes) / _hdd_bandwidth;
         _hddTime += _hdd_latency + transferTime;
 

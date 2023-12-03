@@ -71,10 +71,10 @@ void testVerifyContentIterator(int numRecords) {
 }
 
 void testSortIterator(RowCount numRecords) {
-    std::cout << "Running SortIterator tests...\n";
+    // std::cout << "Running SortIterator tests...\n";
     
     // Manually creating some records for testing
-    std::cout << "Sorting " << numRecords << " records (" << numRecords * sizeof(Record) << " bytes)...\n";
+    // std::cout << "Sorting " << numRecords << " records (" << numRecords * sizeof(Record) << " bytes)...\n";
 
     // Assuming SortPlan takes another Plan as input
     ScanPlan scanPlan(numRecords);  // Just a placeholder; replace with your actual input plan
@@ -87,7 +87,7 @@ void testSortIterator(RowCount numRecords) {
     // Initialize SortIterator
     Iterator* sortIt = verifyConsumerPlan.init();
     
-    std::cout << "Getting next element\n";
+    // std::cout << "Getting next element\n";
     int i = 0;
     while (true) {
         Record* record = sortIt->next();
@@ -235,8 +235,6 @@ int main(int argc, char *argv[]) {
     }
 
     std::cout << "All unit tests passed.\n";
-    return 0;
- 
     return 0;
 }
 

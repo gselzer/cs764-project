@@ -9,7 +9,7 @@
 LoserTree::LoserTree(std::vector<Run*>cacheOfRuns, int runCount){
     // Set up runs array (array of Run pointers)
     _runCount = runCount;
-    //    std::cout << "Run Count: " << _runCount << "\n";
+       
     while(!IsPowerOf2(_runCount)) {
         _runCount++;
     }
@@ -150,8 +150,7 @@ void MultiStageLoserTree::append(CacheSizedRun *run ) {
     _cacheOfRuns.push_back(run);
     if(_cacheOfRuns.size()>_fanOut){
         flushCacheRuns();
-    }
-    
+    }    
 }
 
 void MultiStageLoserTree::reduce() {

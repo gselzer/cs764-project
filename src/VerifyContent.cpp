@@ -56,7 +56,7 @@ VerifyContentIterator::VerifyContentIterator (VerifyContentPlan const * const pl
 
 VerifyContentIterator::~VerifyContentIterator ()
 {
-	traceprintf ("produced %lu of %lu rows\n",
+	std::cout<< ("Verifying Content: produced %lu of %lu rows\n",
 			(unsigned long) (_produced),
 			(unsigned long) (_consumed));
 

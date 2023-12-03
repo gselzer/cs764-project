@@ -1,8 +1,10 @@
 #include "Sort.h"
 #include <vector>
+#include <iostream>
 
 // Merge function for merge sort
 void merge(std::vector<Record*>& records, int l, int m, int r) {
+    std::cout<<"Merging "<<r - l + 1<<" records\n";
     int n1 = m - l + 1;
     int n2 = r - m;
 
@@ -75,6 +77,7 @@ SortIterator::SortIterator(const SortPlan* plan)
         records.push_back(record);
         record = _input->next();
     }
+    std::cout<<"In-Memory Sorting: Sorting "<<records.size()<<" records\n";
     sort(records);
     _sortedRecords.swap(records);
 }
