@@ -3,13 +3,24 @@
 #include <exception>
 
 CacheSizedRun::CacheSizedRun(): _produce_idx(0), _consume_idx(0) {
+  try {
     _records = (Record *) malloc(RUN_BYTES);
+    } catch (const std::bad_alloc&) {
+        // Handle memory allocation failure gracefully
+        std::cerr << "Failed to allocate memory for _records.";
+    }
 }
 
 void CacheSizedRun::push(Record * record) {
     if (record != nullptr) {
-        _records[_produce_idx++] = *record;
+        if (_produce_idx < RUN_RECORDS){
+            _records[_produce_idx++] = *record;
         delete record;
+        } else {
+            //Handle buffer overflow gracfeully
+            std::cerr << "Buffer overflow";
+        }
+        
     }
 }
 
@@ -29,7 +40,11 @@ Record *CacheSizedRun::pop() {
 
 CacheSizedRun::~CacheSizedRun() {
     free(_records);   
-}
+} 
+
+/**CacheSizedRun::~CacheSizedRun() {
+    free(_records);   
+}**/
 
 void CacheSizedRun::sort() {
     std::cout<<"Sorting "<<_produce_idx<<" records\n";
@@ -97,10 +112,12 @@ FileBackedRun::FileBackedRun(RunStorageState *state):
 }
 
 FileBackedRun::~FileBackedRun() {
-    std::fclose(file);
+    if (file!=nullptr){
+        std::fclose(file);
+    }
     _state->read(_produce_idx * sizeof(Record), _onSSD);
     free(buffer);
-    delete _last;
+    free(_last);
 }
 
 void FileBackedRun::push(Record * other) {
@@ -159,7 +176,7 @@ bool RunStorageState::write(const int noBytes) {
     if (_ssd_size - _ssdAllocated > 0) {
         // Write out to SSD
         std::cout << "Writing " << noBytes << " bytes to SSD\n";
-        float transferTime = ((double) noBytes) / _ssd_bandwidth;
+        float transferTime = static_cast<float>(noBytes) / _ssd_bandwidth;
         _ssdTime += _ssd_latency + transferTime;
 
         _ssdAllocated += noBytes;
@@ -168,7 +185,7 @@ bool RunStorageState::write(const int noBytes) {
     else {
         // Write out to HDD
         std::cout << "Writing " << noBytes << " bytes to HDD\n";    
-        float transferTime = ((double) noBytes) / _hdd_bandwidth;
+        float transferTime = static_cast<float>(noBytes) / _hdd_bandwidth;
         _hddTime += _hdd_latency + transferTime;
 
         _hddAllocated += noBytes;
@@ -180,7 +197,7 @@ void RunStorageState::read(const int noBytes, const bool readFromSSD) {
     if (readFromSSD) {
         // Write out to SSD
         std::cout << "Reading " << noBytes << " bytes from SSD\n";
-        float transferTime = ((double) noBytes) / _ssd_bandwidth;
+        float transferTime = static_cast<float>(noBytes) / _ssd_bandwidth;
         _ssdTime += _ssd_latency + transferTime;
 
         _ssdAllocated -= noBytes;
@@ -188,7 +205,7 @@ void RunStorageState::read(const int noBytes, const bool readFromSSD) {
     else {
         // Write out to HDD
         std::cout << "Reading " << noBytes << " bytes from HDD\n";
-        float transferTime = ((double) noBytes) / _hdd_bandwidth;
+        float transferTime = static_cast<float>(noBytes) / _hdd_bandwidth;
         _hddTime += _hdd_latency + transferTime;
 
         _hddAllocated -= noBytes;
