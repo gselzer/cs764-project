@@ -169,7 +169,8 @@ void MultiStageLoserTree::reduce() {
             int remainingRuns = _count - _readIdx;
             int numRuns = _fanOut < remainingRuns ? _fanOut : remainingRuns;
 
-            LoserTree *tree = new LoserTree(_fileBackedRuns, numRuns);
+            std::vector<Run *> subVector (_fileBackedRuns.begin() + _readIdx, _fileBackedRuns.begin() + _readIdx + numRuns);
+            LoserTree *tree = new LoserTree(subVector, numRuns);
             // Read out the sorted results to a file-backed run
             FileBackedRun *run = new FileBackedRun(_state);
             Record *r = tree->next();
@@ -184,10 +185,10 @@ void MultiStageLoserTree::reduce() {
             _fileBackedRuns[_storeIdx++] = run;
             // Increment readIdx
             _readIdx += numRuns;
-            // Update count - we removed numRuns runs, but added one more.
             delete tree;
         }
         _count = _storeIdx;
+        _fileBackedRuns.erase(_fileBackedRuns.begin() + _storeIdx, _fileBackedRuns.end());
     } 
 }
 
