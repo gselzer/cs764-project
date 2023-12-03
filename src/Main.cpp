@@ -212,15 +212,24 @@ int main(int argc, char *argv[]) {
     
     
  // Output to trace file
-
     std::ofstream traceOut(traceFile);
-    testSortIterator(numRecords);
+//  override the cout stream buffer with a file stream buffer
+    std::streambuf *cout_buffer = std::cout.rdbuf(); 
+    // save the current buffer 
+    std::cout.rdbuf(traceOut.rdbuf()); 
+    // redirect cout to the output file 
+
+
+    
+
     
     if (traceOut.is_open()) {
-        traceOut << "Memory access sizes and latencies\n";
-        // Log actual data
+        //Main Function Working
+            testSortIterator(numRecords);
         
         traceOut.close();
+        std::cout.rdbuf(cout_buffer); 
+        // restore the original cout buffer 
     } else {
         std::cerr << "Failed to open trace file: " << traceFile << "\n";
     }
