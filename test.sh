@@ -1,7 +1,7 @@
 # Starting and stopping Powers of 2
 
-START=0
-END=22
+START=30
+END=33
 
 make clean
 make

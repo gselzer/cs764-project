@@ -10,6 +10,27 @@ public:
     virtual Record* pop() = 0;
 }; // class Run
 
+class DynamicRun: public Run {
+public:
+    DynamicRun(size_t pageSize, size_t recordSize);
+    ~DynamicRun();
+    void push(Record *);
+    Record* peek();
+    Record* pop();
+    void sort();
+private:
+    void quicksort(int low, int high, Record &tmp);
+    int partition(int low,int high, Record &tmp);
+    size_t _maxRecords;
+    size_t _pageSize;
+    size_t _recordSize;
+    size_t _rowSize;
+    Record* _records;
+    char *_rows;
+    int _produce_idx;
+    int _consume_idx;
+}; // class DynamicRun
+
 class EmptyRun: public Run{ 
 public:
     void push(Record *);
@@ -19,12 +40,13 @@ public:
 
 class CacheSizedRun: public Run {
 public:
-    CacheSizedRun();
+    CacheSizedRun(size_t recordSize);
     ~CacheSizedRun();
     void push(Record *);
     void sort();
     Record* peek();
     Record* pop();
+    int bufSize;
 private:
     void merge(int l, int m, int r);
     void quicksort(int low, int high);
@@ -32,6 +54,7 @@ private:
     Record *_records;
     int _produce_idx;
     int _consume_idx;
+    size_t _recordSize;
 }; // class Run
 
 class RunStorageState
@@ -59,7 +82,7 @@ class RunStorageState
 
 class FileBackedRun: public Run {
 public:
-    FileBackedRun(RunStorageState *state);
+    FileBackedRun(RunStorageState *state, size_t recordSize);
     ~FileBackedRun();
     void push(Record *);
     void harden();
@@ -74,5 +97,7 @@ private:
     Record *_last;
     RunStorageState *_state;
     bool _onSSD; 
-    const int bufSize = (PAGE_SIZE) / sizeof(Record);
+    int _bufSize;
+    size_t _recordSize;
+    int _s;
 }; // class FileBackedRun

@@ -6,7 +6,7 @@
 class VerifyContentState
 {
 public:
-	VerifyContentState();
+	VerifyContentState(size_t const recordSize);
 	~VerifyContentState ();
 	void incrementDiff(Record *r);
 	void decrementDiff(Record *r);

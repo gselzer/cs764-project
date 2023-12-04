@@ -24,7 +24,7 @@ class MultiStageLoserTree
 {
 	friend class ExternalMergeSortIterator;
 public:
-    MultiStageLoserTree(RunStorageState *state);
+    MultiStageLoserTree(RunStorageState *state, size_t recordSize);
     ~MultiStageLoserTree();
     Record* next();
     void append(CacheSizedRun *run);
@@ -32,8 +32,9 @@ public:
     void flushCacheRuns();
 
 private:
-    float _fanOut = 0.9 * CACHE_SIZE / (RUN_BYTES);
+    float _fanOut = 0.9 * CACHE_SIZE / (CPU_CACHE_SIZE);
     std::vector <Run*> _cacheOfRuns;
     std::vector <Run *> _fileBackedRuns;
     RunStorageState *_state;
+    size_t _recordSize;
 }; // class LoserTree
