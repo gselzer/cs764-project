@@ -50,8 +50,8 @@ class RunStorageState
 	const int _hdd_bandwidth = 100 * (2 << 19); // 100 MB/s
 	const uint64_t _ssd_size = ((uint64_t) 10 )* (2 << 29); // 10 GB
 
-	int _ssdAllocated;
-    int _hddAllocated;
+	uint64_t _ssdAllocated;
+    uint64_t _hddAllocated;
 	float _ssdTime;
     float _hddTime;
     

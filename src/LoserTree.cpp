@@ -138,11 +138,13 @@ MultiStageLoserTree::MultiStageLoserTree(RunStorageState *state): _state(state){
 }
 
 MultiStageLoserTree::~MultiStageLoserTree() {
+    delete _tree;
     _fileBackedRuns.clear();
 }
 
 Record *MultiStageLoserTree::next() {
-    return _fileBackedRuns[0]->pop();
+    // return _fileBackedRuns[0]->pop();
+    return _tree->next();
 }
 
 void MultiStageLoserTree::append(CacheSizedRun *run ) {
@@ -155,11 +157,20 @@ void MultiStageLoserTree::append(CacheSizedRun *run ) {
 
 void MultiStageLoserTree::reduce() {
     // TODO: Delete all of the old runs!
-    if(_cacheOfRuns.size()>0){
-        flushCacheRuns();
+    // if(_cacheOfRuns.size()>0){
+    //    
+    // }
+    if(_cacheOfRuns.size()<_fanOut && _fileBackedRuns.size()==0){
+        std::cout<<"As Number of Records are low so no need to Spill to Disk\n";
+        _tree = new LoserTree(_cacheOfRuns, _cacheOfRuns.size());
+        
     }
+    else{
+          if(_cacheOfRuns.size()>0){
+                flushCacheRuns();
+          }
     int _count = _fileBackedRuns.size();
-    while(_count > 1) {
+    while(_count > _fanOut) {
         int _storeIdx = 0;
         int _readIdx = 0;
         // Iterate across all runs
@@ -186,9 +197,12 @@ void MultiStageLoserTree::reduce() {
             _readIdx += numRuns;
             delete tree;
         }
+
         _count = _storeIdx;
         _fileBackedRuns.erase(_fileBackedRuns.begin() + _storeIdx, _fileBackedRuns.end());
     } 
+    _tree = new LoserTree(_fileBackedRuns, _fileBackedRuns.size());
+    }
 }
 
 void MultiStageLoserTree::flushCacheRuns(){

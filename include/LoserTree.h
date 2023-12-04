@@ -36,4 +36,5 @@ private:
     std::vector <Run*> _cacheOfRuns;
     std::vector <Run *> _fileBackedRuns;
     RunStorageState *_state;
+    LoserTree *_tree;
 }; // class LoserTree

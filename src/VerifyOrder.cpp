@@ -34,9 +34,7 @@ VerifyOrderIterator::VerifyOrderIterator (VerifyOrderPlan const * const plan) :
 VerifyOrderIterator::~VerifyOrderIterator ()
 {
 	TRACE (false);
-	std::cout<< ("Verify Order: produced %lu of %lu rows\n",
-			(unsigned long) (_produced),
-			(unsigned long) (_consumed));
+	std::cout<< "Verify Order: produced "<< (unsigned long) (_produced) <<" of "<< (unsigned long) (_consumed)<<" rows\n";
 
     delete _input;
 	delete _last;

@@ -169,21 +169,23 @@ RunStorageState::~RunStorageState() {
 
 // Returns true iff "written to SSD"
 bool RunStorageState::write(const int noBytes) {
-    if (_ssd_size - _ssdAllocated > 0) {
+   
+    if (_ssdAllocated + noBytes <= _ssd_size ) {
+         std::cout<<_ssdAllocated<<" / "<<_ssd_size<<"  - SSD State\n";
         // Write out to SSD
         std::cout << "Writing " << noBytes << " bytes to SSD\n";
+        std::cout << "SSD allocated: " << _ssdAllocated << "\n";
         float transferTime = static_cast<float>(noBytes) / _ssd_bandwidth;
         _ssdTime += _ssd_latency + transferTime;
-
         _ssdAllocated += noBytes;
         return true;
     }
     else {
         // Write out to HDD
-        std::cout << "Writing " << noBytes << " bytes to HDD\n";    
+        std::cout << "Writing " << noBytes << " bytes to HDD\n"; 
+        std::cout<<_hddAllocated<<" / "<< "Inf  - HDD State\n";   
         float transferTime = static_cast<float>(noBytes) / _hdd_bandwidth;
         _hddTime += _hdd_latency + transferTime;
-
         _hddAllocated += noBytes;
         return false;
     }

@@ -10,6 +10,12 @@
 
 The implementation can be found in Run.cpp, on line X. The CPU Cache Merge sort sorts groups of Records such that the total number of bytes in the sort fits within the CPU Cache. We specifically use less space than the given amount to leave space for e.g. Instructions, other objects, etc.
 
+### External Merge Sort - Implemented by Gabe and Nitigya
+The external merge sort lives in LoserTree.cpp	
+
+### Executable Compilation - Implemented by Nitigya
+Made the entire refactor into different folders for header files and cpp files. In addition Generated additional code in addition to the starter code by implementing Unit Testings for Scan and Sort. In additon implemented the Main Function which created the entire trace files and Controls the Control Variable.
+
 ### Quicksort - Implemented by Rafael and Sweksha
 
 This implementation can be found in Run.cpp.
@@ -18,24 +24,19 @@ This implementation can be found in Run.cpp.
 
 The implementation can be found in LoserTree.cpp, on line X.
 
-### External Merge Sort - Implemented by Gabe and Nitigya
-
-The external merge sort lives in LoserTree.cpp	
-
 ### Verification of Record Content and Order - Implemented by Gabe
 
 The content verification plan/iterator live in VerifyContent.cpp.
 The order verification plan/iterator live in VerifyOrder.cpp.
 
-### Offset Value Coding - Implemented by Gabe
-
+### Offset Value Coding - Implemented by Gabe and Nitigya
 The offset value codes can be found as state of the Record class, in Record.cpp.
 
 ### Cache Sized Miniruns - Implemented by Gabe
 
 These Cache-Sized mini runs make use of the internal merge sort, implemented by Nitigya. The CacheSizedRun class lives in Run.cpp, which the internal merge sort 
 
-### Spilling (Memory to SSD), (SSD to HDD) - Implemented by Gabe, (Rafael advised on call)
+### Spilling (Memory to SSD), (SSD to HDD) - Implemented by Gabe and Nitigya, (Rafael advised on call)
 Spilling from Memory to SSD can be found in LoserTree, within the MultiStageLoserTree class.
 
 File Backed Runs are used to spill to both SSD and HDD - in practice, they write to and read from a std::tmpfile. Because we cannot actually decide whether we physically spill to SSD or HDD, each edits a shared state, which virtually keeps track of how many spilled to each device. The logic for spilling is simple - if there’s room for a run on SSD, it goes there. Otherwise, we spill to HDD.

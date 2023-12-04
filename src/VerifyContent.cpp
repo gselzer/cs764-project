@@ -56,12 +56,18 @@ VerifyContentIterator::VerifyContentIterator (VerifyContentPlan const * const pl
 
 VerifyContentIterator::~VerifyContentIterator ()
 {
-	std::cout<< ("Verifying Content: produced %lu of %lu rows\n",
-			(unsigned long) (_produced),
-			(unsigned long) (_consumed));
-
+	if(!_isProducer){
 	assert (_plan->_state->allSeen());
+std::cout<< " Verifying Content: produced "<<(unsigned long) (_produced)<< " of "<< (unsigned long) (_consumed)<<" rows\n";
+	}
+	
+	else{
+	assert (_plan->_state->allSeen());
+std::cout<< " Verifying Content: Consumed "<<(unsigned long) (_produced)<< " of "<< (unsigned long) (_consumed)<<" rows\n";
+	}
+		
 
+	
 	delete _input;
 } // VerifyContentIterator::~VerifyContentIterator
 

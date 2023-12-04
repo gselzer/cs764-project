@@ -100,7 +100,7 @@ void testSortIterator(RowCount numRecords) {
     
     delete sortIt;
     
-    std::cout << "SortIterator tests passed.\n";
+    // std::cout << "SortIterator tests passed.\n";
 }
 
 void testLoserTree() {
@@ -237,4 +237,5 @@ int main(int argc, char *argv[]) {
     std::cout << "All unit tests passed.\n";
     return 0;
 }
+
 

@@ -77,7 +77,7 @@ SortIterator::SortIterator(const SortPlan* plan)
         records.push_back(record);
         record = _input->next();
     }
-    std::cout<<"In-Memory Sorting: Sorting "<<records.size()<<" records\n";
+    std::cout<<"In-Memory : Sorting "<<records.size()<<" records\n";
     sort(records);
     _sortedRecords.swap(records);
 }
