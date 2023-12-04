@@ -2,21 +2,24 @@
 #include <iostream>
 #include <ostream>
 
+int s;
 Record::Record(Record *other) {
 	 if (other == nullptr) {
         throw std::invalid_argument("Null pointer passed to Record copy constructor");
     }
-	row1 = other->row1;
-    row2 = other->row2;
-    row3 = other->row3;
+	
+	row1 = (char *) malloc((s / 3) * sizeof(char));
+	row2 = (char *) malloc((s / 3) * sizeof(char));
+	row3 = (char *) malloc((s / 3) * sizeof(char));
+
     _offset = other->_offset;
     _value = other->_value;
 	TRACE(false);
 }
 
 // Constructor
-Record::Record(int r1, int r2, int r3) : row1(r1), row2(r2), row3(r3), _offset(-1), _value(-1) {
-	TRACE(false);
+Record::Record(int r1, int r2, int r3, int s) : row1(r1), row2(r2), row3(r3), _offset(-1), _value(-1) {
+	TRACE(false); 
 }
 
 // Destructor
@@ -53,9 +56,13 @@ bool Record::operator==(Record that) {
 }
 
 void Record::operator^=(Record that) {
-	row1 ^= that.row1;
-	row2 ^= that.row2;
-	row3 ^= that.row3;
+	int s;
+	for (int i = 0; i < s / 3; i++){
+		row1[i] ^= that.row1[i];
+		row2[i] ^= that.row2[i];
+		row3[i] ^= that.row3[i];
+	}
+	
 }
 
 std::ostream& operator<<(std::ostream& os, Record const &r) {
@@ -65,27 +72,30 @@ std::ostream& operator<<(std::ostream& os, Record const &r) {
 
 void Record::encodeOVC(Record *other) {
 	// Assume that other < this
+	int s;
+	for (int i = 0; i < s / 3; i++){
+
 	if (other == nullptr) {
 		_offset = 0;
-		_value = row1;
+		_value = row1[i];
 		return;
 	}
 
-	if (other->row1 < row1) {
+	if (other->row1[i] < row1[i]) {
 		_offset = 1;
-		_value = row1;
-	} else if (other->row2 < row2) {
+		_value = row1[i];
+	} else if (other->row2[i] < row2[i]) {
 		_offset = 2;
-		_value = row2;
-	} else if (other->row3 < row3) {
+		_value = row2[i];
+	} else if (other->row3[i] < row3[i]) {
 		_offset = 3;
-		_value = row3;
+		_value = row3[i];
 	} else {
 		// Equal records
 		_offset = 4;
-		_value = row1;
+		_value = row1[i];
 	}
-
+	}
 }
 
 bool Record::leOVC(Record *other) {

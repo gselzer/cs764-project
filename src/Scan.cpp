@@ -47,8 +47,11 @@ Record* ScanIterator::next ()
 		rand() % 100, // Row 2
 		rand() % 100  // Row 3
 	);
-	if (r->row1 > 100 || r->row2 > 100 || r->row3 > 100) {
+	int s;
+	for (int i = 0; i < s / 3; i++){
+	if (r->row1[i] > 100 || r->row2[i] > 100 || r->row3[i] > 100) {
 		std::cout << "Erroneous row: " << *r << "\n";
+	}
 	}
 	return r;
 }// ScanIterator::next

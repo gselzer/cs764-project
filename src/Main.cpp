@@ -6,6 +6,7 @@
 #include "../include/VerifyContent.h"
 #include "../include/LoserTree.h"
 #include "../include/Run.h"
+#include "../include/Record.h"
 #include <iostream>
 #include <cassert>
 #include <vector>
