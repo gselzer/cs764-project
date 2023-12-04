@@ -48,11 +48,12 @@ void sort(RowCount numRecords, size_t recordSize) {
     std::cout << "SortIterator tests passed.\n";
 }
 
-void testDynamicRun(RowCount numRecords, size_t recordSize) {
+void testDynamicCacheSizedRun(RowCount numRecords, size_t recordSize) {
 	size_t rowSize = (recordSize - sizeof(Record)) / 3 ;
 
     // Try a CPU Cache-sized run
-    DynamicRun *run = new DynamicRun(CPU_CACHE_SIZE, rowSize);
+    RunStorageState *state = new RunStorageState();
+    DynamicRun *run = new DynamicRun(state, CPU_CACHE_SIZE, rowSize);
     std::vector<Record*> recs;
 
     for(size_t i = 0; i < numRecords; i++) {
@@ -62,6 +63,7 @@ void testDynamicRun(RowCount numRecords, size_t recordSize) {
     }
 
     run->sort();
+    run->harden();
 
 	// TODO: Needs to be minimum value
     std::vector<Record*> sorted;
@@ -95,6 +97,35 @@ void testDynamicRun(RowCount numRecords, size_t recordSize) {
 
 
     delete _last;
+    delete run;
+}
+
+void testDynamicFileSizedRun(RowCount numRecords, size_t recordSize) {
+	size_t rowSize = (recordSize - sizeof(Record)) / 3 ;
+
+    RunStorageState *state = new RunStorageState();
+    DynamicRun *run = new DynamicRun(state, state->_ssd_page_size, rowSize);
+    std::vector<Record*> recs;
+
+    for(size_t i = 0; i < numRecords; i++) {
+        Record *r = new Record(recordSize);
+        recs.push_back(r);
+        run->push(r);
+    }
+
+    run->harden();
+
+    std::vector<Record*> sorted;
+
+    for(size_t i = 0; i < numRecords; i++) {
+        Record *r = run->pop();
+        assert(*r == *recs[i]);
+    }
+    assert(nullptr == run->peek());
+
+    std::cout << "All tests passed!\n";
+
+
     delete run;
 }
 
@@ -150,7 +181,11 @@ int main(int argc, char *argv[]) {
     // if (traceOut.is_open()) {
         //Main Function Working
         // sort(numRecords);
-        testDynamicRun(numRecords, recordSize);
+    if (recordSize * numRecords < CPU_CACHE_SIZE) {
+        testDynamicCacheSizedRun(numRecords, recordSize);
+    } else {
+        testDynamicFileSizedRun(numRecords, recordSize);
+    }
         
     //     traceOut.close();
     //     std::cout.rdbuf(cout_buffer); 

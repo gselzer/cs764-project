@@ -24,7 +24,7 @@ Record::Record(Record *other) {
 }
 
 // Constructor
-Record::Record(size_t s) : _offset(-1), _value(-1) {
+Record::Record(int s) : _offset(-1), _value(-1) {
 	// Divide remaining size by 3
 	// TODO - don't lose remainder!
 	rowSize = (s - sizeof(Record)) / 3 ;
@@ -34,7 +34,7 @@ Record::Record(size_t s) : _offset(-1), _value(-1) {
 	row3 = new char[rowSize];
 	_allocated = true;
 
-	for(size_t i = 0; i < rowSize - 1; i++) {
+	for(int i = 0; i < rowSize - 1; i++) {
 		row1[i] = (char) (rand() % 128);
 		row2[i] = (char) (rand() % 128);
 		row3[i] = (char) (rand() % 128);
@@ -47,7 +47,7 @@ Record::Record(size_t s) : _offset(-1), _value(-1) {
 }
 
 // Constructorc
-Record::Record(char *row1, char *row2, char *row3, size_t s) : row1(row1), row2(row2), row3(row3), _offset(-1), _value(-1) {
+Record::Record(char *row1, char *row2, char *row3, int s) : row1(row1), row2(row2), row3(row3), _offset(-1), _value(-1) {
 	// Divide remaining size by 3
 	// TODO - don't lose remainder!
 	rowSize = (s - sizeof(Record)) / 3 ;
@@ -65,24 +65,24 @@ Record::~Record() {
 	TRACE(false);
 }
 
-size_t Record::size() {
+int Record::size() {
 	return 3 * rowSize + sizeof(Record);
 }
 
 bool Record::operator<=(Record& that) {
 	if (rowSize == 0) rowSize = that.rowSize;
 	// Could maybe be written more simply with conditionals, but conditions are slow supposedly?
-	for(size_t i = 0; i < rowSize; i++) {
+	for(int i = 0; i < rowSize; i++) {
 		if (row1[i] != that.row1[i]) {
 			return row1[i] < that.row1[i];
 		}
 	}
-	for(size_t i = 0; i < rowSize; i++) {
+	for(int i = 0; i < rowSize; i++) {
 		if (row2[i] != that.row2[i]) {
 			return row2[i] < that.row2[i];
 		}
 	}
-	for(size_t i = 0; i < rowSize; i++) {
+	for(int i = 0; i < rowSize; i++) {
 		if (row3[i] != that.row3[i]) {
 			return row3[i] < that.row3[i];
 		}
@@ -103,17 +103,17 @@ Record &Record::operator=(const Record &that) {
 }
 
 bool Record::operator==(Record& that) {
-	for(size_t i = 0; i < rowSize; i++) {
+	for(int i = 0; i < rowSize; i++) {
 		if (row1[i] != that.row1[i]) {
 			return false;
 		}
 	}
-	for(size_t i = 0; i < rowSize; i++) {
+	for(int i = 0; i < rowSize; i++) {
 		if (row2[i] != that.row2[i]) {
 			return false;
 		}
 	}
-	for(size_t i = 0; i < rowSize; i++) {
+	for(int i = 0; i < rowSize; i++) {
 		if (row3[i] != that.row3[i]) {
 			return false;
 		}
@@ -122,7 +122,7 @@ bool Record::operator==(Record& that) {
 }
 
 void Record::operator^=(Record &that) {
-	for (size_t i = 0; i < rowSize; i++){
+	for (int i = 0; i < rowSize; i++){
 		row1[i] ^= that.row1[i];
 		row2[i] ^= that.row2[i];
 		row3[i] ^= that.row3[i];
@@ -141,21 +141,21 @@ void Record::encodeOVC(Record *other) {
 		_value = 0;
 		return;
 	}
-	for (size_t i = 0; i < rowSize; i++){
+	for (int i = 0; i < rowSize; i++){
 		if (other->row1[i] < row1[i]) {
 			_offset = i + 1;
 			_value = row1[i];
 			return;
 		}
 	}
-	for (size_t i = 0; i < rowSize; i++){
+	for (int i = 0; i < rowSize; i++){
 		if (other->row2[i] < row2[i]) {
 			_offset = rowSize + i + 1;
 			_value = row2[i];
 			return;
 		}
 	}
-	for (size_t i = 0; i < rowSize; i++){
+	for (int i = 0; i < rowSize; i++){
 		if (other->row3[i] < row3[i]) {
 			_offset = rowSize + rowSize + i + 1;
 			_value = row3[i];

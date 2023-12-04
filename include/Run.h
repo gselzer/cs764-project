@@ -10,27 +10,6 @@ public:
     virtual Record* pop() = 0;
 }; // class Run
 
-class DynamicRun: public Run {
-public:
-    DynamicRun(size_t pageSize, size_t recordSize);
-    ~DynamicRun();
-    void push(Record *);
-    Record* peek();
-    Record* pop();
-    void sort();
-private:
-    void quicksort(int low, int high, Record &tmp);
-    int partition(int low,int high, Record &tmp);
-    size_t _maxRecords;
-    size_t _pageSize;
-    size_t _recordSize;
-    size_t _rowSize;
-    Record* _records;
-    char *_rows;
-    int _produce_idx;
-    int _consume_idx;
-}; // class DynamicRun
-
 class EmptyRun: public Run{ 
 public:
     void push(Record *);
@@ -64,13 +43,13 @@ class RunStorageState
 	~RunStorageState();
 	bool write(const int noBytes);
 	void read(const int noBytes, const bool readFromSSD);
-	private:
-	const int _ssd_page_size = 4 * (2 << 9); // 4 KB
-	const int _hdd_page_size = 8 * (2 << 9); // 8 KB
 	const float _ssd_latency = 0.0001; // 0.1 ms
 	const float _hdd_latency = 0.01; // 10 ms
 	const int _ssd_bandwidth = 100 * (2 << 19); // 100 MB/s
 	const int _hdd_bandwidth = 100 * (2 << 19); // 100 MB/s
+	const int _ssd_page_size = _ssd_latency * _ssd_bandwidth; // 
+	const int _hdd_page_size = _hdd_latency * _hdd_bandwidth; // 
+	private:
 	const uint64_t _ssd_size = ((uint64_t) 10 )* (2 << 29); // 10 GB
 
 	int _ssdAllocated;
@@ -101,3 +80,30 @@ private:
     size_t _recordSize;
     int _s;
 }; // class FileBackedRun
+
+class DynamicRun: public Run {
+public:
+    DynamicRun(RunStorageState * state, size_t pageSize, size_t recordSize);
+    ~DynamicRun();
+    void push(Record *);
+    Record* peek();
+    Record* pop();
+    void sort();
+    void harden();
+private:
+    void quicksort(int low, int high, Record &tmp);
+    int partition(int low,int high, Record &tmp);
+    std::FILE *file = nullptr;
+    size_t _maxRecords;
+    size_t _pageSize;
+    size_t _recordSize;
+    size_t _rowSize;
+    Record* _records;
+    char *_rows;
+    int _produce_idx;
+    int _consume_idx;
+    int _readRemaining;
+    RunStorageState *_state;
+    bool _onSSD; 
+    Record *_last;
+}; // class DynamicRun

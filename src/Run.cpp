@@ -289,17 +289,18 @@ void RunStorageState::read(const int noBytes, const bool readFromSSD) {
 // }
 
 
-DynamicRun::DynamicRun(size_t pageSize, size_t rowSize):
+DynamicRun::DynamicRun(RunStorageState *state, size_t pageSize, size_t rowSize):
     _pageSize(pageSize),
     _rowSize(rowSize),
     _recordSize(sizeof(Record) + 3 * rowSize),
     _produce_idx(0),
-    _consume_idx(0)
+    _consume_idx(0),
+    _state(state)
 {
+    _last = new Record(_recordSize);
     _maxRecords =  _pageSize / _recordSize;
     _records = (Record *) malloc(_maxRecords * sizeof(Record));
     _rows = new char[3 * _maxRecords * rowSize];
-    std::cout << "Run created\n";
 }
 
 DynamicRun::~DynamicRun() {
@@ -308,46 +309,91 @@ DynamicRun::~DynamicRun() {
 }
 
 void DynamicRun::push(Record *r) {
-    if (_produce_idx >= _maxRecords) {
-        throw std::runtime_error("Cannot accept another record - this Run, which can store " + std::to_string(_maxRecords) + " is already full!\n");
+    // if (_produce_idx >= _maxRecords) {
+    //     throw std::runtime_error("Cannot accept another record - this Run, which can store " + std::to_string(_maxRecords) + " is already full!\n");
 
-    }
-    char* rowIdx = _rows + (_produce_idx * 3 * _rowSize);
+    // }
+    int destIdx = _produce_idx % _maxRecords;
+    char* rowIdx = _rows + (destIdx * 3 * _rowSize);
     memcpy(rowIdx, r->row1, _rowSize);
-    _records[_produce_idx].row1 = rowIdx;
+    _records[destIdx].row1 = rowIdx;
 
     rowIdx += _rowSize;
     memcpy(rowIdx, r->row2, _rowSize);
-    _records[_produce_idx].row2 = rowIdx;
+    _records[destIdx].row2 = rowIdx;
 
     rowIdx += _rowSize;
     memcpy(rowIdx, r->row3, _rowSize);
-    _records[_produce_idx].row3 = rowIdx;
-    _records[_produce_idx].rowSize = r->rowSize;
+    _records[destIdx].row3 = rowIdx;
+    _records[destIdx].rowSize = r->rowSize;
 
     _produce_idx++;
+
+    if (_produce_idx % _maxRecords == 0) {
+        if (file == nullptr) {
+            file = std::tmpfile();
+        }
+        std::fwrite(_records, sizeof(Record), _maxRecords, file);
+        std::fwrite(_rows, sizeof(char), 3 * _maxRecords * _rowSize, file);
+        std::cout << "Writing out " << _maxRecords << " Records to file\n";
+    }
 }
 
 Record* DynamicRun::peek() {
     if (_consume_idx < _produce_idx) {
-        return _records + _consume_idx;
+        if (_readRemaining == 0) {
+            _readRemaining += std::fread(_records, sizeof(Record), _maxRecords, file);
+            std::fread(_rows, sizeof(char), 3 * _maxRecords * _rowSize, file);
+        }
+        return _records + (_consume_idx % _maxRecords);
     }
     return nullptr;
 }
 
 Record *DynamicRun::pop() {
     if (_consume_idx < _produce_idx) {
-        // TODO: Read to/from File
-        // if (_readRemaining == 0) {
-        //     _readRemaining += std::fread(buffer, _recordSize, _bufSize, file);
-        // }
-        return &_records[_consume_idx++];
+        if (_readRemaining == 0) {
+            _readRemaining += std::fread(_records, sizeof(Record), _maxRecords, file);
+            std::fread(_rows, sizeof(char), 3 * _maxRecords * _rowSize, file);
+            int totalBytes = (sizeof(Record) * _maxRecords) + (sizeof(char) * 3 * _maxRecords * _rowSize);
+            std::cout << "Read in " << _maxRecords << " records from the file\n";
+
+        }
+        int srcIndex = _consume_idx % _maxRecords;
+        char* rowIdx = _rows + (srcIndex * 3 * _rowSize);
+        *_last = *(_records + srcIndex);
+        // _last->row1 = rowIdx;
+        // _last->row2 = rowIdx + _rowSize;
+        // _last->row3 = rowIdx + _rowSize + _rowSize;
+        _consume_idx++;
+        _readRemaining--;
+        return _last;
     }
     return nullptr;
 }
 
+// This function should be called once all Records that this Run should store
+// have been pushed, and we are ready to start popping records. Before this
+// function is called, Records should not be popped, and after this function
+// is called, Records should not be pushed.
+void DynamicRun::harden() {
+    if (_produce_idx < _maxRecords) {
+        _readRemaining = _produce_idx;
+        return;
+    }
+    if (file == nullptr) {
+        file = std::tmpfile();
+    }
+    std::cout << "Writing out " << _maxRecords << " Records to file\n";
+    std::fwrite(_records, sizeof(Record), _maxRecords, file);
+    std::fwrite(_rows, sizeof(char), 3 * _maxRecords * _rowSize, file);
+    _onSSD = _state->write(_produce_idx * _recordSize);
+
+    rewind(file);
+}
+
 void DynamicRun::sort() {
-    if (!_pageSize == CPU_CACHE_SIZE) {
+    if (!(_pageSize == CPU_CACHE_SIZE) && _produce_idx <= _maxRecords) {
         throw std::runtime_error("cannot sort a DynamicRun of size unless it is the CPU Cache size!\n");
     }
     int n = _produce_idx;
