@@ -101,7 +101,7 @@ FileBackedRun::FileBackedRun(RunStorageState *state):
     _consume_idx(0),
     _readRemaining(0)
 {
-    _last = new Record(0, 0, 0);
+    _last = new Record(0, 0, 0, 0);
     _state = state;
     file = std::tmpfile();
     buffer = (Record *) malloc(PAGE_SIZE);

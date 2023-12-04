@@ -2,7 +2,6 @@
 #include <iostream>
 #include <ostream>
 
-int s;
 Record::Record(Record *other) {
 	 if (other == nullptr) {
         throw std::invalid_argument("Null pointer passed to Record copy constructor");
@@ -18,8 +17,18 @@ Record::Record(Record *other) {
 }
 
 // Constructor
-Record::Record(int r1, int r2, int r3, int s) : row1(r1), row2(r2), row3(r3), _offset(-1), _value(-1) {
-	TRACE(false); 
+Record::Record(int r1, int r2, int r3, int s) : _offset(-1), _value(-1) {
+    row1 = new char[s / 3];
+    row2 = new char[s / 3];
+    row3 = new char[s / 3];
+
+    for (int i = 0; i < s / 3; i++) {
+        row1[i] = static_cast<char>(r1);
+        row2[i] = static_cast<char>(r2);
+        row3[i] = static_cast<char>(r3);
+    }
+
+    TRACE(false);
 }
 
 // Destructor
@@ -56,7 +65,6 @@ bool Record::operator==(Record that) {
 }
 
 void Record::operator^=(Record that) {
-	int s;
 	for (int i = 0; i < s / 3; i++){
 		row1[i] ^= that.row1[i];
 		row2[i] ^= that.row2[i];
@@ -72,7 +80,6 @@ std::ostream& operator<<(std::ostream& os, Record const &r) {
 
 void Record::encodeOVC(Record *other) {
 	// Assume that other < this
-	int s;
 	for (int i = 0; i < s / 3; i++){
 
 	if (other == nullptr) {

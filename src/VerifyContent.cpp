@@ -6,8 +6,8 @@
 
 VerifyContentState::VerifyContentState() : _diffSeen(0)
 {
-	_diff = new Record(0, 0, 0);
-	_noDiff = new Record(0, 0, 0);
+	_diff = new Record(0, 0, 0,0);
+	_noDiff = new Record(0, 0, 0,0);
 }
 
 VerifyContentState::~VerifyContentState()

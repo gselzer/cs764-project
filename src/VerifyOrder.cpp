@@ -28,7 +28,7 @@ VerifyOrderIterator::VerifyOrderIterator (VerifyOrderPlan const * const plan) :
 {
 	TRACE (false);
 	int min = std::numeric_limits<int>::min();
-	_last = new Record(min, min, min);
+	_last = new Record(min, min, min, min);
 } // VerifyOrderIterator::VerifyOrderIterator
 
 VerifyOrderIterator::~VerifyOrderIterator ()

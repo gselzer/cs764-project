@@ -1,4 +1,5 @@
 #include "Scan.h"
+#include "../include/Record.h"
 #include<iostream>
 #include<cstdlib>
 
@@ -45,8 +46,10 @@ Record* ScanIterator::next ()
     Record * r = new Record(
 		rand() % 100, // Row 1
 		rand() % 100, // Row 2
-		rand() % 100  // Row 3
+		rand() % 100, // Row 3
+		rand() % 100 //s
 	);
+
 	int s;
 	for (int i = 0; i < s / 3; i++){
 	if (r->row1[i] > 100 || r->row2[i] > 100 || r->row3[i] > 100) {

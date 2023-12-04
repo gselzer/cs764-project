@@ -39,7 +39,7 @@ void sort(RowCount numRecords) {
             std::cout << "Done! No More Records.\n";
             break;
         }
-    //    std::cout << i++ << ": " << *record << "\n";
+        std::cout << i++ << ": " << *record << "\n";
     }
     
     delete sortIt;
