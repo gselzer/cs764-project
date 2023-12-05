@@ -6,7 +6,7 @@ END=20
 make clean
 make
 
-if [ -f "results" ]; then
+if [ -d "results" ]; then
   rm -rf results
 fi
 mkdir results
