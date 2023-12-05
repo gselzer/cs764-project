@@ -105,11 +105,11 @@ void testDynamicFileSizedRun(RowCount numRecords, size_t recordSize) {
 
     RunStorageState *state = new RunStorageState();
     DynamicRun *run = new DynamicRun(state, state->_ssd_page_size, rowSize);
-    std::vector<Record*> recs;
+    // std::vector<Record*> recs;
 
     for(size_t i = 0; i < numRecords; i++) {
         Record *r = new Record(recordSize);
-        recs.push_back(r);
+        // recs.push_back(r);
         run->push(r);
     }
 
@@ -119,7 +119,7 @@ void testDynamicFileSizedRun(RowCount numRecords, size_t recordSize) {
 
     for(size_t i = 0; i < numRecords; i++) {
         Record *r = run->pop();
-        assert(*r == *recs[i]);
+        // assert(*r == *recs[i]);
     }
     assert(nullptr == run->peek());
 
@@ -180,12 +180,12 @@ int main(int argc, char *argv[]) {
     
     // if (traceOut.is_open()) {
         //Main Function Working
-        // sort(numRecords);
-    if (recordSize * numRecords < CPU_CACHE_SIZE) {
-        testDynamicCacheSizedRun(numRecords, recordSize);
-    } else {
-        testDynamicFileSizedRun(numRecords, recordSize);
-    }
+        sort(numRecords, recordSize);
+    // if (recordSize * numRecords < CPU_CACHE_SIZE) {
+    //     testDynamicCacheSizedRun(numRecords, recordSize);
+    // } else {
+    //     testDynamicFileSizedRun(numRecords, recordSize);
+    // }
         
     //     traceOut.close();
     //     std::cout.rdbuf(cout_buffer); 

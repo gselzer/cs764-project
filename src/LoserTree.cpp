@@ -150,7 +150,7 @@ Record *MultiStageLoserTree::next() {
     return _tree->next();
 }
 
-void MultiStageLoserTree::append(CacheSizedRun *run ) {
+void MultiStageLoserTree::append(DynamicRun *run ) {
     // float _fanOut = 0.9 * CACHE_SIZE / ;
     _cacheOfRuns.push_back(run);
     if(_cacheOfRuns.size()>_fanOut){
@@ -185,7 +185,8 @@ void MultiStageLoserTree::reduce() {
             std::vector<Run *> subVector (_fileBackedRuns.begin() + _readIdx, _fileBackedRuns.begin() + _readIdx + numRuns);
             LoserTree *tree = new LoserTree(subVector, numRuns);
             // Read out the sorted results to a file-backed run
-            FileBackedRun *run = new FileBackedRun(_state, _recordSize);
+            //TO DO : Make HDD great again
+            DynamicRun *run = new DynamicRun(_state,_state->_ssd_page_size, _recordSize);
             Record *r = tree->next();
             // Temp pointer to enable OVC calculation
             while(r != nullptr) {
@@ -211,7 +212,7 @@ void MultiStageLoserTree::reduce() {
 void MultiStageLoserTree::flushCacheRuns(){
     LoserTree *tree = new LoserTree(_cacheOfRuns, _cacheOfRuns.size());
     // Read out the sorted results to a file-backed run
-    FileBackedRun *run = new FileBackedRun(_state, _recordSize);
+    DynamicRun *run = new DynamicRun(_state,_state->_ssd_page_size, _recordSize);
     Record *r = tree->next();
     // Temp pointer to enable OVC calculation
     while(r != nullptr) {

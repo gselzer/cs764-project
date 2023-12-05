@@ -27,7 +27,7 @@ public:
     MultiStageLoserTree(RunStorageState *state, size_t recordSize);
     ~MultiStageLoserTree();
     Record* next();
-    void append(CacheSizedRun *run);
+    void append(DynamicRun *run);
     void reduce();
     void flushCacheRuns();
 

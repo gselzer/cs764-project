@@ -315,6 +315,10 @@ void DynamicRun::push(Record *r) {
     //     throw std::runtime_error("Cannot accept another record - this Run, which can store " + std::to_string(_maxRecords) + " is already full!\n");
 
     // }
+    if(r == nullptr) {
+        // std::cout << "Pushing null record\n";
+        return;
+    }
     int destIdx = _produce_idx % _maxRecords;
     char* rowIdx = _rows + (destIdx * 3 * _rowSize);
     memcpy(rowIdx, r->row1, _rowSize);
@@ -330,6 +334,7 @@ void DynamicRun::push(Record *r) {
     _records[destIdx].rowSize = r->rowSize;
 
     _produce_idx++;
+    delete r;
 
     if (_produce_idx % _maxRecords == 0) {
         if (file == nullptr) {

@@ -27,13 +27,14 @@ ExternalMergeSortIterator::ExternalMergeSortIterator(const ExternalMergeSortPlan
     _state = new RunStorageState();
     _tree = new MultiStageLoserTree(_state, r->size());
     while (r != nullptr) {
-        CacheSizedRun *run = new CacheSizedRun(r->size());
+        DynamicRun *run = new DynamicRun(_state,CPU_CACHE_SIZE,r->size());
         // Fill in the run array
-        for (uint64_t i = 0; i < run->bufSize; i++) {
+        for (uint64_t i = 0; i < run->_maxRecords; i++) {
             run->push(r);
             r = _input->next();
         }
         run->sort();
+        run->harden();
         // records.push_back(run);
         _tree->append(run);
     } 

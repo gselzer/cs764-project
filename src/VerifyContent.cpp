@@ -8,7 +8,7 @@ VerifyContentState::VerifyContentState(size_t const recordSize) : _diffSeen(0)
 {
 	_diff = new Record(recordSize);
 	_noDiff = new Record(recordSize);
-	for(int i = 0; i < recordSize / 3; i++) {
+	for(int i = 0; i < _diff->rowSize; i++) {
 		_diff->row1[i] = 0;
 		_diff->row2[i] = 0;
 		_diff->row3[i] = 0;

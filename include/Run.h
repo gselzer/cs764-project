@@ -90,11 +90,11 @@ public:
     Record* pop();
     void sort();
     void harden();
+    size_t _maxRecords;
 private:
     void quicksort(int low, int high, Record &tmp);
     int partition(int low,int high, Record &tmp);
     std::FILE *file = nullptr;
-    size_t _maxRecords;
     size_t _pageSize;
     size_t _recordSize;
     size_t _rowSize;
