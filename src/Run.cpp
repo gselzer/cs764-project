@@ -308,7 +308,7 @@ DynamicRun::DynamicRun(RunStorageState *state, size_t pageSize, size_t rowSize):
 DynamicRun::~DynamicRun() {
     delete _last;
     delete[] _records;
-    delete _rows;
+    delete[] _rows;
 }
 
 void DynamicRun::push(Record *r) {
@@ -340,8 +340,8 @@ void DynamicRun::push(Record *r) {
     rowIdx += _rowSize;
     memcpy(rowIdx, r->row3, _rowSize);
     _records[destIdx].row3 = rowIdx;
-    _records[destIdx].rowSize = r->rowSize;
 
+    _records[destIdx].rowSize = r->rowSize;
     _produce_idx++;
     delete r;
 

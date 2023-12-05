@@ -26,15 +26,8 @@ VerifyOrderIterator::VerifyOrderIterator (VerifyOrderPlan const * const plan) :
 	_consumed (0),
 	_produced (0)
 {
+	_last = new Record(plan->_recordSize);
 	TRACE (false);
-	int min = std::numeric_limits<int>::min();
-	// TODO: Needs to be minimum value
-	_last = new Record(_plan->_recordSize);
-	for(int i = 0; i < plan->_recordSize / 3; i++){
-		_last->row1[i] = 0;
-		_last->row2[i] = 0;
-		_last->row3[i] = 0;
-	}
 } // VerifyOrderIterator::VerifyOrderIterator
 
 VerifyOrderIterator::~VerifyOrderIterator ()
@@ -50,6 +43,10 @@ Record* VerifyOrderIterator::next ()
 {
     TRACE (false);
 	Record *r = _input->next();
+	if (_produced == 0) {
+		std::cout << "Setting the Start Record\n";
+		*_last = *r;
+	}
 	if (r != nullptr) {
 		_produced++;
 		assert(*_last <= *r);

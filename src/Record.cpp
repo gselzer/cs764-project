@@ -58,9 +58,9 @@ Record::Record(char *row1, char *row2, char *row3, int s) : row1(row1), row2(row
 // Destructor
 Record::~Record() {
 	if (_allocated) {
-		delete row1;
-		delete row2;
-		delete row3;
+		delete[] row1;
+		delete[] row2;
+		delete[] row3;
 	}
 	TRACE(false);
 }
