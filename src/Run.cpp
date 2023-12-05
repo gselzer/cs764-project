@@ -374,7 +374,9 @@ Record *DynamicRun::pop() {
         // _last->row3 = rowIdx + _rowSize + _rowSize;
         _consume_idx++;
         _readRemaining--;
-        return _last;
+        // return _last;
+        return new Record(*_last);
+
     }
     return nullptr;
 }

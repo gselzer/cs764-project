@@ -19,7 +19,7 @@ void sort(RowCount numRecords, size_t recordSize) {
     // std::cout << "Running SortIterator tests...\n";
     
     // Manually creating some records for testing
-    // std::cout << "Sorting " << numRecords << " records (" << numRecords * sizeof(Record) << " bytes)...\n";
+    std::cout << "Sorting " << numRecords << " records (" << numRecords * recordSize << " bytes)...\n";
 
     // Assuming SortPlan takes another Plan as input
     ScanPlan scanPlan(numRecords, recordSize);  // Just a placeholder; replace with your actual input plan
@@ -39,8 +39,9 @@ void sort(RowCount numRecords, size_t recordSize) {
         if (record == nullptr) {
             break;
         }
-        std::cout << "Got a record!\n";
-        std::cout << i++ << ": " << *record << "\n";
+        // std::cout << "Got a record!\n";
+        // std::cout << i++ << ": " << *record << "\n";
+        // delete record;5
     }
     
     delete sortIt;
