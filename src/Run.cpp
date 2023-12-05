@@ -5,92 +5,92 @@
 #include <exception>
 #include <cstring>
 
-CacheSizedRun::CacheSizedRun(size_t recordSize):
-    bufSize((CPU_CACHE_SIZE) / recordSize),
-    _produce_idx(0),
-    _consume_idx(0),
-    _recordSize(recordSize)
-{
-  try {
-    // _records = (Record *) malloc(RUN_BYTES);
-    } catch (const std::bad_alloc&) {
-        // Handle memory allocation failure gracefully
-        std::cerr << "Failed to allocate memory for _records.";
-    }
-}
+// CacheSizedRun::CacheSizedRun(size_t recordSize):
+//     bufSize((CPU_CACHE_SIZE) / recordSize),
+//     _produce_idx(0),
+//     _consume_idx(0),
+//     _recordSize(recordSize)
+// {
+//   try {
+//     // _records = (Record *) malloc(RUN_BYTES);
+//     } catch (const std::bad_alloc&) {
+//         // Handle memory allocation failure gracefully
+//         std::cerr << "Failed to allocate memory for _records.";
+//     }
+// }
 
-void CacheSizedRun::push(Record * record) {
-    if (record != nullptr) {
-        if (_produce_idx < bufSize){
-            _records[_produce_idx++] = *record;
-        delete record;
-        } else {
-            //Handle buffer overflow gracfeully
-            std::cerr << "Buffer overflow";
-        }
+// void CacheSizedRun::push(Record * record) {
+//     if (record != nullptr) {
+//         if (_produce_idx < bufSize){
+//             _records[_produce_idx++] = *record;
+//         delete record;
+//         } else {
+//             //Handle buffer overflow gracfeully
+//             std::cerr << "Buffer overflow";
+//         }
         
-    }
-}
+//     }
+// }
 
-Record *CacheSizedRun::peek() {
-    if (_consume_idx < _produce_idx) {
-        return _records + _consume_idx;
-    }
-    return nullptr;
-}
+// Record *CacheSizedRun::peek() {
+//     if (_consume_idx < _produce_idx) {
+//         return _records + _consume_idx;
+//     }
+//     return nullptr;
+// }
 
-Record *CacheSizedRun::pop() {
-    if (_consume_idx < _produce_idx) {
-        return _records + _consume_idx++;
-    }
-    return nullptr;
-}
+// Record *CacheSizedRun::pop() {
+//     if (_consume_idx < _produce_idx) {
+//         return _records + _consume_idx++;
+//     }
+//     return nullptr;
+// }
 
-CacheSizedRun::~CacheSizedRun() {
-    free(_records);   
-} 
+// CacheSizedRun::~CacheSizedRun() {
+//     free(_records);   
+// } 
 
-void CacheSizedRun::sort() {
-    std::cout<<"Sorting "<<_produce_idx<<" records\n";
-    int n = _produce_idx;
-    // We're already sorted if we have 0 or 1 elements
-    if (_produce_idx < 2) {
-        return;
-    }
+// void CacheSizedRun::sort() {
+//     std::cout<<"Sorting "<<_produce_idx<<" records\n";
+//     int n = _produce_idx;
+//     // We're already sorted if we have 0 or 1 elements
+//     if (_produce_idx < 2) {
+//         return;
+//     }
     
-    // Declare the quicksort function
+//     // Declare the quicksort function
 
-    quicksort(0, n - 1);
+//     quicksort(0, n - 1);
 
-    // Step 2: Encode offset value
-    _records[0].encodeOVC(nullptr);
-    for (int i = 1; i < _produce_idx; i++) {
-        _records[i].encodeOVC(_records + i - 1);
-    }
-}
+//     // Step 2: Encode offset value
+//     _records[0].encodeOVC(nullptr);
+//     for (int i = 1; i < _produce_idx; i++) {
+//         _records[i].encodeOVC(_records + i - 1);
+//     }
+// }
 
-void CacheSizedRun::quicksort(int low, int high) {
-    if (low < high) {
-        int pivot = partition(low, high);
-        quicksort(low, pivot - 1);
-        quicksort(pivot + 1, high);
-    }
-}
+// void CacheSizedRun::quicksort(int low, int high) {
+//     if (low < high) {
+//         int pivot = partition(low, high);
+//         quicksort(low, pivot - 1);
+//         quicksort(pivot + 1, high);
+//     }
+// }
 
-int CacheSizedRun::partition(int low, int high) {
-    Record pivot = _records[high];
-    int i = low - 1;
+// int CacheSizedRun::partition(int low, int high) {
+//     Record pivot = _records[high];
+//     int i = low - 1;
 
-    for (int j = low; j < high; j++) {
-        if (_records[j] <= pivot) {
-            i++;
-            std::swap(_records[i], _records[j]);
-        }
-    }
+//     for (int j = low; j < high; j++) {
+//         if (_records[j] <= pivot) {
+//             i++;
+//             std::swap(_records[i], _records[j]);
+//         }
+//     }
 
-    std::swap(_records[i + 1], _records[high]);
-    return i + 1;
-}
+//     std::swap(_records[i + 1], _records[high]);
+//     return i + 1;
+// }
 
 void EmptyRun::push(Record *) {
     //nop
@@ -104,70 +104,70 @@ Record* EmptyRun::pop() {
     return nullptr;
 }
 
-FileBackedRun::FileBackedRun(RunStorageState *state, size_t recordSize): 
-    _produce_idx(0),
-    _consume_idx(0),
-    _readRemaining(0),
-    _recordSize(recordSize),
-    _bufSize((PAGE_SIZE) / recordSize)
-{
-    _last = new Record(_recordSize);
-    _state = state;
-    file = std::tmpfile();
-    buffer = (Record *) malloc(PAGE_SIZE);
-}
+// FileBackedRun::FileBackedRun(RunStorageState *state, size_t recordSize): 
+//     _produce_idx(0),
+//     _consume_idx(0),
+//     _readRemaining(0),
+//     _recordSize(recordSize),
+//     _bufSize((PAGE_SIZE) / recordSize)
+// {
+//     _last = new Record(_recordSize);
+//     _state = state;
+//     file = std::tmpfile();
+//     buffer = (Record *) malloc(PAGE_SIZE);
+// }
 
-FileBackedRun::~FileBackedRun() {
-    if (file!=nullptr){
-        std::fclose(file);
-    }
-    _state->read(_produce_idx * _recordSize, _onSSD);
-    free(buffer);
-    free(_last);
-}
+// FileBackedRun::~FileBackedRun() {
+//     if (file!=nullptr){
+//         std::fclose(file);
+//     }
+//     _state->read(_produce_idx * _recordSize, _onSSD);
+//     free(buffer);
+//     free(_last);
+// }
 
-void FileBackedRun::push(Record * other) {
-    buffer[_produce_idx % _bufSize] = other;
-    _produce_idx++;
-    if (_produce_idx % _bufSize == 0) {
-        std::fwrite(buffer, _recordSize, _bufSize, file);
-    }
-}
+// void FileBackedRun::push(Record * other) {
+//     buffer[_produce_idx % _bufSize] = other;
+//     _produce_idx++;
+//     if (_produce_idx % _bufSize == 0) {
+//         std::fwrite(buffer, _recordSize, _bufSize, file);
+//     }
+// }
 
-// This function should be called once all Records that this Run should store
-// have been pushed, and we are ready to start popping records. Before this
-// function is called, Records should not be popped, and after this function
-// is called, Records should not be pushed.
-void FileBackedRun::harden() {
-    std::fwrite(buffer, _recordSize, _produce_idx % _bufSize, file);
-    _onSSD = _state->write(_produce_idx * _recordSize);
+// // This function should be called once all Records that this Run should store
+// // have been pushed, and we are ready to start popping records. Before this
+// // function is called, Records should not be popped, and after this function
+// // is called, Records should not be pushed.
+// void FileBackedRun::harden() {
+//     std::fwrite(buffer, _recordSize, _produce_idx % _bufSize, file);
+//     _onSSD = _state->write(_produce_idx * _recordSize);
 
-    std::cout << "Wrote " << _produce_idx << " Records to the file\n";
-    rewind(file);
-}
+//     std::cout << "Wrote " << _produce_idx << " Records to the file\n";
+//     rewind(file);
+// }
 
-Record *FileBackedRun::peek() {
-    if (_consume_idx < _produce_idx) {
-        if (_readRemaining == 0) {
-            _readRemaining += std::fread(buffer, _recordSize, _bufSize, file);
-        }
-        return buffer + (_consume_idx % _bufSize);
-    }
-    return nullptr;
-}
+// Record *FileBackedRun::peek() {
+//     if (_consume_idx < _produce_idx) {
+//         if (_readRemaining == 0) {
+//             _readRemaining += std::fread(buffer, _recordSize, _bufSize, file);
+//         }
+//         return buffer + (_consume_idx % _bufSize);
+//     }
+//     return nullptr;
+// }
 
-Record *FileBackedRun::pop() {
-    if (_consume_idx < _produce_idx) {
-        if (_readRemaining == 0) {
-            _readRemaining += std::fread(buffer, _recordSize, _bufSize, file);
-            // std::cout << "Consume Index =" << _consume_idx << " - reading in " << _readRemaining << " more rows...\n";
-        }
-        *_last = (buffer + (_consume_idx % _bufSize));
-        _consume_idx++;
-        _readRemaining--;
-        return _last;
-    } return nullptr;
-}
+// Record *FileBackedRun::pop() {
+//     if (_consume_idx < _produce_idx) {
+//         if (_readRemaining == 0) {
+//             _readRemaining += std::fread(buffer, _recordSize, _bufSize, file);
+//             // std::cout << "Consume Index =" << _consume_idx << " - reading in " << _readRemaining << " more rows...\n";
+//         }
+//         *_last = (buffer + (_consume_idx % _bufSize));
+//         _consume_idx++;
+//         _readRemaining--;
+//         return _last;
+//     } return nullptr;
+// }
 
 RunStorageState::RunStorageState() : _ssdAllocated(0), _hddAllocated(0), _ssdTime(0), _hddTime(0) {
 }
@@ -311,6 +311,14 @@ DynamicRun::~DynamicRun() {
 }
 
 void DynamicRun::push(Record *r) {
+     if (_produce_idx % _maxRecords == 0 && _produce_idx != 0) {
+        if (file == nullptr) {
+            file = std::tmpfile();
+        }
+        std::fwrite(_records, sizeof(Record), _maxRecords, file);
+        std::fwrite(_rows, sizeof(char), 3 * _maxRecords * _rowSize, file);
+        std::cout << "Writing out " << _maxRecords << " Records to file\n";
+    }
     // if (_produce_idx >= _maxRecords) {
     //     throw std::runtime_error("Cannot accept another record - this Run, which can store " + std::to_string(_maxRecords) + " is already full!\n");
 
@@ -336,14 +344,7 @@ void DynamicRun::push(Record *r) {
     _produce_idx++;
     delete r;
 
-    if (_produce_idx % _maxRecords == 0) {
-        if (file == nullptr) {
-            file = std::tmpfile();
-        }
-        std::fwrite(_records, sizeof(Record), _maxRecords, file);
-        std::fwrite(_rows, sizeof(char), 3 * _maxRecords * _rowSize, file);
-        std::cout << "Writing out " << _maxRecords << " Records to file\n";
-    }
+    
 }
 
 Record* DynamicRun::peek() {

@@ -3,23 +3,21 @@
 #include <cstring>
 #include <ostream>
 
-Record::Record(Record *other) {
-	 if (other == nullptr) {
-        throw std::invalid_argument("Null pointer passed to Record copy constructor");
-    }
-	rowSize = other->rowSize;
+Record::Record(Record &other) {
+	 
+	rowSize = other.rowSize;
 	
 	row1 = new char[rowSize];
 	row2 = new char[rowSize];
 	row3 = new char[rowSize];
 
-	memcpy(row1, other->row1, rowSize);
-	memcpy(row2, other->row2, rowSize);
-	memcpy(row3, other->row3, rowSize);
+	memcpy(row1, other.row1, rowSize);
+	memcpy(row2, other.row2, rowSize);
+	memcpy(row3, other.row3, rowSize);
 	_allocated = true;
 
-    _offset = other->_offset;
-    _value = other->_value;
+    _offset = other._offset;
+    _value = other._value;
 	TRACE(false);
 }
 
@@ -58,7 +56,7 @@ Record::Record(char *row1, char *row2, char *row3, int s) : row1(row1), row2(row
 // Destructor
 Record::~Record() {
 	if (_allocated) {
-		delete row1;
+		free (row1);
 		delete row2;
 		delete row3;
 	}

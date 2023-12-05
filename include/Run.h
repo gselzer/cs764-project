@@ -91,18 +91,18 @@ public:
     void sort();
     void harden();
     size_t _maxRecords;
+    int _readRemaining;
+    size_t _rowSize;
 private:
     void quicksort(int low, int high, Record &tmp);
     int partition(int low,int high, Record &tmp);
     std::FILE *file = nullptr;
     size_t _pageSize;
     size_t _recordSize;
-    size_t _rowSize;
     Record* _records;
     char *_rows;
     int _produce_idx;
     int _consume_idx;
-    int _readRemaining;
     RunStorageState *_state;
     bool _onSSD; 
     Record *_last;

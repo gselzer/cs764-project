@@ -34,7 +34,8 @@ ExternalMergeSortIterator::ExternalMergeSortIterator(const ExternalMergeSortPlan
             r = _input->next();
         }
         run->sort();
-        run->harden();
+        run->_readRemaining = run->_maxRecords;
+        // run->harden();
         // records.push_back(run);
         _tree->append(run);
     } 

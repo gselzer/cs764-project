@@ -8,7 +8,7 @@ class LoserTree
 {
 	friend class ExternalMergeSortIterator;
 public:
-    LoserTree(std::vector<Run*>cacheOfRuns, int runCount);
+    LoserTree(std::vector<DynamicRun*>cacheOfRuns, int runCount);
     ~LoserTree();
     Record* next();
 private:
@@ -32,9 +32,9 @@ public:
     void flushCacheRuns();
 
 private:
-    float _fanOut = 0.9 * CACHE_SIZE / (CPU_CACHE_SIZE);
-    std::vector <Run*> _cacheOfRuns;
-    std::vector <Run *> _fileBackedRuns;
+    float _fanOutSSD = 0.95 * CACHE_SIZE / (CPU_CACHE_SIZE);
+    std::vector <DynamicRun*> _cacheOfRuns;
+    std::vector <DynamicRun *> _fileBackedRuns;
     RunStorageState *_state;
     LoserTree *_tree;
     size_t _recordSize;
