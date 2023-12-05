@@ -73,8 +73,12 @@ void LoserTree::replayGame(int idx, int prevWinner) {
         // std::cout << "Index " << prevWinner << " is out of records - " <<  prevLoser << " wins \n";
         winner = prevLoser;
         loser = prevWinner;
+    // } else if (*rl <= *rw) {
     } else if (rl->leOVC(rw)) {
         // std::cout << "Previous Loser " << *rl << " beat out Previous Winner " <<  *rw << "\n";
+        // if(rl->leOVC(rw)){
+
+        // }
         rw->encodeOVC(rl);
         winner = prevLoser;
         loser = prevWinner;
@@ -186,7 +190,7 @@ void MultiStageLoserTree::reduce() {
             LoserTree *tree = new LoserTree(subVector, numRuns);
             // Read out the sorted results to a file-backed run
             //TO DO : Make HDD great again
-            DynamicRun *run = new DynamicRun(_state,_state->_ssd_page_size, _recordSize);
+            DynamicRun *run = new DynamicRun(_state,_state->_hdd_page_size, _recordSize);
             Record *r = tree->next();
             // Temp pointer to enable OVC calculation
             while(r != nullptr) {

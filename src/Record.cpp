@@ -56,7 +56,7 @@ Record::Record(char *row1, char *row2, char *row3, int s) : row1(row1), row2(row
 // Destructor
 Record::~Record() {
 	if (_allocated) {
-		free (row1);
+		delete row1;
 		delete row2;
 		delete row3;
 	}
@@ -166,6 +166,9 @@ void Record::encodeOVC(Record *other) {
 }
 
 bool Record::leOVC(Record *other) {
+	if(other->_offset == 0 && other->_value == 0 || _offset == 0 && _value == 0) {
+		return *this <= *other;
+	}
 	if (_offset != other->_offset) {
 		return _offset > other->_offset;
 	}

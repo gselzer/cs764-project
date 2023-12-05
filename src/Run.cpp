@@ -317,7 +317,7 @@ void DynamicRun::push(Record *r) {
         }
         std::fwrite(_records, sizeof(Record), _maxRecords, file);
         std::fwrite(_rows, sizeof(char), 3 * _maxRecords * _rowSize, file);
-        std::cout << "Writing out " << _maxRecords << " Records to file\n";
+        // std::cout << "Writing out " << _maxRecords << " Records to file\n";
     }
     // if (_produce_idx >= _maxRecords) {
     //     throw std::runtime_error("Cannot accept another record - this Run, which can store " + std::to_string(_maxRecords) + " is already full!\n");
@@ -403,6 +403,7 @@ void DynamicRun::harden() {
 }
 
 void DynamicRun::sort() {
+    // std::cout<<"Sorting "<<_produce_idx<<" records\n";
     if (!(_pageSize == CPU_CACHE_SIZE) && _produce_idx <= _maxRecords) {
         throw std::runtime_error("cannot sort a DynamicRun of size unless it is the CPU Cache size!\n");
     }
@@ -414,6 +415,7 @@ void DynamicRun::sort() {
     
     // Declare the quicksort function
     Record *tmp = new Record(3 * _rowSize + sizeof(Record));
+    
     quicksort(0, n - 1, *tmp);
 
     // Step 2: Encode offset value
