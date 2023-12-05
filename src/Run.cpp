@@ -301,12 +301,13 @@ DynamicRun::DynamicRun(RunStorageState *state, size_t pageSize, size_t rowSize):
 {
     _last = new Record(_recordSize);
     _maxRecords =  _pageSize / _recordSize;
-    _records = (Record *) malloc(_maxRecords * sizeof(Record));
+    _records = new Record[_maxRecords];
     _rows = new char[3 * _maxRecords * rowSize];
 }
 
 DynamicRun::~DynamicRun() {
-    free(_records);
+    delete _last;
+    delete[] _records;
     delete _rows;
 }
 
@@ -415,8 +416,9 @@ void DynamicRun::sort() {
     
     // Declare the quicksort function
     Record *tmp = new Record(3 * _rowSize + sizeof(Record));
-    
     quicksort(0, n - 1, *tmp);
+    delete tmp;
+
 
     // Step 2: Encode offset value
     _records[0].encodeOVC(nullptr);

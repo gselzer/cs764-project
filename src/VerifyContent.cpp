@@ -46,6 +46,9 @@ VerifyContentPlan::VerifyContentPlan (Plan *const input, VerifyContentState *con
 
 VerifyContentPlan::~VerifyContentPlan ()
 {
+	if(!_isProducer) {
+		delete _state;
+	}
 } // VerifyContentPlan::~VerifyContentPlan
 
 Iterator * VerifyContentPlan::init () const

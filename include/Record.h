@@ -7,6 +7,7 @@ public:
     char* row1; 
     char* row2; 
     char* row3;
+    Record();
     Record(Record &other);
     Record(int s);
     Record(char *row1, char *row2, char *row3, int s);

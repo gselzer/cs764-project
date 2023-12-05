@@ -3,6 +3,8 @@
 #include <cstring>
 #include <ostream>
 
+Record::Record() {}
+
 Record::Record(Record &other) {
 	 
 	rowSize = other.rowSize;

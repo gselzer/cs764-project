@@ -41,7 +41,7 @@ void sort(RowCount numRecords, size_t recordSize) {
         }
         // std::cout << "Got a record!\n";
         // std::cout << i++ << ": " << *record << "\n";
-        // delete record;
+        delete record;
     }
     
     delete sortIt;
