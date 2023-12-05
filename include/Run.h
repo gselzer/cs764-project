@@ -93,12 +93,12 @@ public:
     size_t _maxRecords;
     int _readRemaining;
     size_t _rowSize;
+    size_t _recordSize;
 private:
     void quicksort(int low, int high, Record &tmp);
     int partition(int low,int high, Record &tmp);
     std::FILE *file = nullptr;
     size_t _pageSize;
-    size_t _recordSize;
     Record* _records;
     char *_rows;
     int _produce_idx;

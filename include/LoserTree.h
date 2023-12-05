@@ -11,6 +11,7 @@ public:
     LoserTree(std::vector<DynamicRun*>cacheOfRuns, int runCount);
     ~LoserTree();
     Record* next();
+    Record *_last = nullptr;
 private:
     void buildTree();
     void replayGame(int idx, int prevWinner);
@@ -38,4 +39,6 @@ private:
     RunStorageState *_state;
     LoserTree *_tree;
     size_t _recordSize;
+    Record *_last;
+    bool _first = true;
 }; // class LoserTree

@@ -312,7 +312,7 @@ DynamicRun::~DynamicRun() {
 }
 
 void DynamicRun::push(Record *r) {
-     if (_produce_idx % _maxRecords == 0 && _produce_idx != 0) {
+    if (_produce_idx % _maxRecords == 0 && _produce_idx != 0) {
         if (file == nullptr) {
             file = std::tmpfile();
         }
@@ -353,6 +353,7 @@ Record* DynamicRun::peek() {
         if (_readRemaining == 0) {
             _readRemaining += std::fread(_records, sizeof(Record), _maxRecords, file);
             std::fread(_rows, sizeof(char), 3 * _maxRecords * _rowSize, file);
+            std::cout << "Read in " << _maxRecords << " records from the file\n";
         }
         return _records + (_consume_idx % _maxRecords);
     }
@@ -370,7 +371,17 @@ Record *DynamicRun::pop() {
         }
         int srcIndex = _consume_idx % _maxRecords;
         char* rowIdx = _rows + (srcIndex * 3 * _rowSize);
+        if (_maxRecords == 10) {
+            Record *r = _records + srcIndex;
+            if (_consume_idx > 0) {
+                if(*r <= *_last) {
+                    *_last = *r;
+                }
+            }
+            *_last = *r;
+        }
         *_last = *(_records + srcIndex);
+
         // _last->row1 = rowIdx;
         // _last->row2 = rowIdx + _rowSize;
         // _last->row3 = rowIdx + _rowSize + _rowSize;
@@ -388,14 +399,18 @@ Record *DynamicRun::pop() {
 // function is called, Records should not be popped, and after this function
 // is called, Records should not be pushed.
 void DynamicRun::harden() {
+    // TODO: Can the if be removed and the else just always happen?
     if (_produce_idx < _maxRecords) {
         _readRemaining = _produce_idx;
         return;
     }
+    else {
+        _readRemaining = 0;
+    }
     if (file == nullptr) {
         file = std::tmpfile();
     }
-    std::cout << "Writing out " << _maxRecords << " Records to file\n";
+    std::cout << "Writing out " << _produce_idx << " Records to file\n";
     std::fwrite(_records, sizeof(Record), _maxRecords, file);
     std::fwrite(_rows, sizeof(char), 3 * _maxRecords * _rowSize, file);
     _onSSD = _state->write(_produce_idx * _recordSize);

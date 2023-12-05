@@ -73,8 +73,8 @@ void LoserTree::replayGame(int idx, int prevWinner) {
         // std::cout << "Index " << prevWinner << " is out of records - " <<  prevLoser << " wins \n";
         winner = prevLoser;
         loser = prevWinner;
-    // } else if (*rl <= *rw) {
-    } else if (rl->leOVC(rw)) {
+    } else if (*rl <= *rw) {
+    // } else if (rl->leOVC(rw)) {
         // std::cout << "Previous Loser " << *rl << " beat out Previous Winner " <<  *rw << "\n";
         // if(rl->leOVC(rw)){
 
@@ -105,7 +105,8 @@ void LoserTree::buildTree() {
             int idx2 = _tmp[2 * i + 1];
             Record *r1 = _runs[idx1]->peek();
             Record *r2 = _runs[idx2]->peek();
-            if (r2 == nullptr || (r1 != nullptr && r1->leOVC(r2))) {
+            if (r2 == nullptr || (r1 != nullptr && *r1 <= *r2)) {
+            // if (r2 == nullptr || (r1 != nullptr && r1->leOVC(r2))) {
                 if (r2 != nullptr) {
                     r2->encodeOVC(r1);
                 }
@@ -142,6 +143,7 @@ MultiStageLoserTree::MultiStageLoserTree(RunStorageState *state, size_t recordSi
     _state(state),
     _recordSize(recordSize)
 {
+    _last = new Record(recordSize);
 }
 
 MultiStageLoserTree::~MultiStageLoserTree() {
@@ -220,6 +222,16 @@ void MultiStageLoserTree::flushCacheRuns(){
     Record *r = tree->next();
     // Temp pointer to enable OVC calculation
     while(r != nullptr) {
+        if (_first) {
+            _first = false;
+            *_last = *r;
+        }
+        else {
+            if (*r <= *_last) {
+                throw std::runtime_error("sldkdkfjsldfjs;fsdjfl\n");
+            }
+            *_last = *r;
+        }
         // Put Record on Run
         // std::cout<<*r<<"\n";
         run->push(r);
@@ -231,5 +243,6 @@ void MultiStageLoserTree::flushCacheRuns(){
 
     _cacheOfRuns.clear();
 
+    _first = true;
     delete tree;
 }
