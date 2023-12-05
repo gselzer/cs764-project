@@ -342,6 +342,8 @@ void DynamicRun::push(Record *r) {
     _records[destIdx].row3 = rowIdx;
 
     _records[destIdx].rowSize = r->rowSize;
+    _records[destIdx]._offset = r->_offset;
+    _records[destIdx]._value = r->_value;
     _produce_idx++;
     delete r;
 

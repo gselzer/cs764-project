@@ -22,7 +22,6 @@ public:
     void operator^= (Record& that);
     friend std::ostream& operator<<(std::ostream& os, const Record& obj);
     int rowSize;
-private:
     int _offset, _value;
     bool _allocated = false;
 };
