@@ -4,10 +4,18 @@
 #include<limits>
 #include<iostream>
 
-VerifyContentState::VerifyContentState() : _diffSeen(0)
+VerifyContentState::VerifyContentState(size_t const recordSize) : _diffSeen(0)
 {
-	_diff = new Record(0, 0, 0);
-	_noDiff = new Record(0, 0, 0);
+	_diff = new Record(recordSize);
+	_noDiff = new Record(recordSize);
+	for(int i = 0; i < recordSize / 3; i++) {
+		_diff->row1[i] = 0;
+		_diff->row2[i] = 0;
+		_diff->row3[i] = 0;
+		_noDiff->row1[i] = 0;
+		_noDiff->row2[i] = 0;
+		_noDiff->row3[i] = 0;
+	}
 }
 
 VerifyContentState::~VerifyContentState()

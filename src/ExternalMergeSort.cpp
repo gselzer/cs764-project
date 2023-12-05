@@ -19,16 +19,17 @@ ExternalMergeSortIterator::ExternalMergeSortIterator(const ExternalMergeSortPlan
       _input(_plan->_input->init()),  
       _currentIdx(0)
 {
-    _state = new RunStorageState();
-    _tree = new MultiStageLoserTree(_state);
     // Step 1: Create Runs
     std::vector<Run*> records;
     Record *r;
     r = _input->next();
+
+    _state = new RunStorageState();
+    _tree = new MultiStageLoserTree(_state, r->size());
     while (r != nullptr) {
-        CacheSizedRun *run = new CacheSizedRun();
+        CacheSizedRun *run = new CacheSizedRun(r->size());
         // Fill in the run array
-        for (uint64_t i = 0; i < RUN_RECORDS; i++) {
+        for (uint64_t i = 0; i < run->bufSize; i++) {
             run->push(r);
             r = _input->next();
         }

@@ -6,11 +6,12 @@ class ScanPlan : public Plan
 {
 	friend class ScanIterator;
 public:
-	ScanPlan (RowCount const count);
+	ScanPlan (RowCount const count, size_t const recordSize);
 	~ScanPlan ();
 	Iterator * init () const;
 private:
 	RowCount const _count;
+	size_t const _recordSize;
 }; // class ScanPlan
 
 class ScanIterator : public Iterator
@@ -22,4 +23,5 @@ public:
 private:
 	ScanPlan const * const _plan;
 	RowCount _count;
+	size_t _recordSize;
 }; // class ScanIterator

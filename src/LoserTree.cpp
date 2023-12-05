@@ -134,7 +134,10 @@ void LoserTree::printTree(){
     std::cout << "]\n";
 }
 
-MultiStageLoserTree::MultiStageLoserTree(RunStorageState *state): _state(state){
+MultiStageLoserTree::MultiStageLoserTree(RunStorageState *state, size_t recordSize):
+    _state(state),
+    _recordSize(recordSize)
+{
 }
 
 MultiStageLoserTree::~MultiStageLoserTree() {
@@ -148,7 +151,7 @@ Record *MultiStageLoserTree::next() {
 }
 
 void MultiStageLoserTree::append(CacheSizedRun *run ) {
-    float _fanOut = 0.9 * CACHE_SIZE / (RUN_BYTES);
+    // float _fanOut = 0.9 * CACHE_SIZE / ;
     _cacheOfRuns.push_back(run);
     if(_cacheOfRuns.size()>_fanOut){
         flushCacheRuns();
@@ -182,7 +185,7 @@ void MultiStageLoserTree::reduce() {
             std::vector<Run *> subVector (_fileBackedRuns.begin() + _readIdx, _fileBackedRuns.begin() + _readIdx + numRuns);
             LoserTree *tree = new LoserTree(subVector, numRuns);
             // Read out the sorted results to a file-backed run
-            FileBackedRun *run = new FileBackedRun(_state);
+            FileBackedRun *run = new FileBackedRun(_state, _recordSize);
             Record *r = tree->next();
             // Temp pointer to enable OVC calculation
             while(r != nullptr) {
@@ -208,7 +211,7 @@ void MultiStageLoserTree::reduce() {
 void MultiStageLoserTree::flushCacheRuns(){
     LoserTree *tree = new LoserTree(_cacheOfRuns, _cacheOfRuns.size());
     // Read out the sorted results to a file-backed run
-    FileBackedRun *run = new FileBackedRun(_state);
+    FileBackedRun *run = new FileBackedRun(_state, _recordSize);
     Record *r = tree->next();
     // Temp pointer to enable OVC calculation
     while(r != nullptr) {

@@ -1,8 +1,9 @@
 #include "Scan.h"
+#include "../include/Record.h"
 #include<iostream>
 #include<cstdlib>
 
-ScanPlan::ScanPlan (RowCount const count) : _count (count)
+ScanPlan::ScanPlan (RowCount const count, size_t const recordSize) : _count (count), _recordSize(recordSize)
 {
 	TRACE (false);
 } // ScanPlan::ScanPlan
@@ -19,7 +20,7 @@ Iterator * ScanPlan::init () const
 } // ScanPlan::init
 
 ScanIterator::ScanIterator (ScanPlan const * const plan) :
-	_plan (plan), _count (0)
+	_plan (plan), _count (0), _recordSize(plan->_recordSize)
 {
 	TRACE (false);
 	// TODO: Consider random initialization
@@ -42,13 +43,12 @@ Record* ScanIterator::next ()
         return nullptr; // Stopping condition
     }
     _count++;
-    Record * r = new Record(
-		rand() % 100, // Row 1
-		rand() % 100, // Row 2
-		rand() % 100  // Row 3
-	);
-	if (r->row1 > 100 || r->row2 > 100 || r->row3 > 100) {
-		std::cout << "Erroneous row: " << *r << "\n";
-	}
+    Record * r = new Record(_recordSize);
+	// int s;
+	// for (int i = 0; i < s / 3; i++){
+	// if (r->row1[i] > 100 || r->row2[i] > 100 || r->row3[i] > 100) {
+	// 	std::cout << "Erroneous row: " << *r << "\n";
+	// }
+	// }
 	return r;
 }// ScanIterator::next

@@ -4,7 +4,7 @@
 #include<limits>
 #include<iostream>
 
-VerifyOrderPlan::VerifyOrderPlan (Plan *const input) : _input (input)
+VerifyOrderPlan::VerifyOrderPlan (Plan *const input, size_t const recordSize) : _input (input), _recordSize(recordSize)
 {
 	TRACE (false);
 } // VerifyOrderPlan::VerifyOrderPlan
@@ -28,7 +28,13 @@ VerifyOrderIterator::VerifyOrderIterator (VerifyOrderPlan const * const plan) :
 {
 	TRACE (false);
 	int min = std::numeric_limits<int>::min();
-	_last = new Record(min, min, min);
+	// TODO: Needs to be minimum value
+	_last = new Record(_plan->_recordSize);
+	for(int i = 0; i < plan->_recordSize / 3; i++){
+		_last->row1[i] = 0;
+		_last->row2[i] = 0;
+		_last->row3[i] = 0;
+	}
 } // VerifyOrderIterator::VerifyOrderIterator
 
 VerifyOrderIterator::~VerifyOrderIterator ()

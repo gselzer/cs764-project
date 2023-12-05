@@ -7,11 +7,12 @@ class VerifyOrderPlan : public Plan
 {
 	friend class VerifyOrderIterator;
 public:
-	VerifyOrderPlan (Plan * const input);
+	VerifyOrderPlan (Plan * const input, size_t const recordSize);
 	~VerifyOrderPlan ();
 	Iterator * init () const;
 private:
 	Plan * _input;
+	size_t _recordSize;
 }; // class VerifyOrderPlan
 
 class VerifyOrderIterator : public Iterator
