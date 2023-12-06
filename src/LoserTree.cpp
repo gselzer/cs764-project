@@ -31,16 +31,11 @@ LoserTree::LoserTree(std::vector<DynamicRun*>cacheOfRuns, int runCount){
         // Build the Tree
         buildTree();
     } catch (...) {
-        cleanup();
         throw;
     }
 }
 
 LoserTree::~LoserTree() {
-    cleanup();
-}
-
-void LoserTree::cleanup() {
     for (int i = 0; i < _runCount; i++) {
         delete _runs[i];
     }
@@ -60,7 +55,7 @@ Record *LoserTree::next() {
         // Return winner
         return r;
     } catch (...) {
-        cleanup();
+        throw;
     }
 }
 
@@ -103,7 +98,6 @@ void LoserTree::replayGame(int idx, int prevWinner) {
         _tree[idx] = loser;
         replayGame(idx / 2, winner);
     } catch (...) {
-        cleanup();
         throw;
     }
 }
@@ -141,7 +135,6 @@ void LoserTree::buildTree() {
 
     free(_tmp);
     } catch (...) {
-        cleanup();
         throw;
     }
 }
