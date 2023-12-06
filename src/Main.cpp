@@ -40,7 +40,7 @@ void sort(RowCount numRecords, size_t recordSize) {
             break;
         }
         // std::cout << "Got a record!\n";
-        std::cout << i++ << ": " << record->row1[0] << "\n";
+        // std::cout << i++ << ": " << record->row1[0] << "\n";
         delete record;
     }
     
@@ -156,10 +156,10 @@ int main(int argc, char *argv[]) {
     
  // Output to trace file
     std::ofstream traceOut(traceFile);
-//  override the cout stream buffer with a file stream buffer
-    std::streambuf *cout_buffer = std::cout.rdbuf(); 
-    // save the current buffer 
-    std::cout.rdbuf(traceOut.rdbuf()); 
+// //  override the cout stream buffer with a file stream buffer
+//     std::streambuf *cout_buffer = std::cout.rdbuf(); 
+//     // save the current buffer 
+//     std::cout.rdbuf(traceOut.rdbuf()); 
     // redirect cout to the output file 
 
     if (traceOut.is_open()) {
@@ -171,7 +171,7 @@ int main(int argc, char *argv[]) {
     //     testDynamicFileSizedRun(numRecords, recordSize);
     // }
         traceOut.close();
-        std::cout.rdbuf(cout_buffer); 
+        // std::cout.rdbuf(cout_buffer); 
         // restore the original cout buffer 
     } else {
         std::cerr << "Failed to open trace file: " << traceFile << "\n";

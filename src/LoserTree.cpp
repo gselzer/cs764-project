@@ -146,7 +146,7 @@ MultiStageLoserTree::MultiStageLoserTree(RunStorageState *state, size_t recordSi
 
 MultiStageLoserTree::~MultiStageLoserTree() {
     delete _tree;
-    _fileBackedRuns.clear();
+    _HDDRuns.clear();
 }
 
 Record *MultiStageLoserTree::next() {
@@ -167,26 +167,37 @@ void MultiStageLoserTree::reduce() {
     // if(_cacheOfRuns.size()>0){
     //    
     // }
-    if(_cacheOfRuns.size()<_fanOutSSD && _fileBackedRuns.size()==0){
+    if(_cacheOfRuns.size()<_fanOutSSD && _SSDRuns.size()==0 && _HDDRuns.size()==0){
         std::cout<<"As Number of Records are low so no need to Spill to Disk\n";
         _tree = new LoserTree(_cacheOfRuns, _cacheOfRuns.size());
+        return;
         
     }
-    else{
-          if(_cacheOfRuns.size()>0){
+    if(_cacheOfRuns.size()>0){
+            std::cout<<"Flushing Cache Runs\n";
                 flushCacheRuns();
           }
-    int _count = _fileBackedRuns.size();
-    while(_count > _fanOutSSD) {
+
+    if(_SSDRuns.size()<_fanOutHDD && _HDDRuns.size()==0){
+        std::cout<<"As Number of Records are low so no need to Spill to Disk\n";
+        _tree = new LoserTree(_SSDRuns, _SSDRuns.size());
+        return;
+    }
+    if(_SSDRuns.size()>0){
+            std::cout<<"Flushing Cache Runs\n";
+                flushSSDRuns();
+          }
+    int _count = _HDDRuns.size();
+    while(_count > _fanOutHDD) {
         int _storeIdx = 0;
         int _readIdx = 0;
         // Iterate across all runs
         while(_readIdx < _count) {
             // Construct a Loser Tree on _f consecutive runs
             int remainingRuns = _count - _readIdx;
-            int numRuns = _fanOutSSD < remainingRuns ? _fanOutSSD : remainingRuns;
+            int numRuns = _fanOutHDD < remainingRuns ? _fanOutHDD : remainingRuns;
 
-            std::vector<DynamicRun *> subVector (_fileBackedRuns.begin() + _readIdx, _fileBackedRuns.begin() + _readIdx + numRuns);
+            std::vector<DynamicRun *> subVector (_HDDRuns.begin() + _readIdx, _HDDRuns.begin() + _readIdx + numRuns);
             LoserTree *tree = new LoserTree(subVector, numRuns);
             // Read out the sorted results to a file-backed run
             //TO DO : Make HDD great again
@@ -200,17 +211,17 @@ void MultiStageLoserTree::reduce() {
             }
             // Store the new run
             run->harden();
-            _fileBackedRuns[_storeIdx++] = run;
+            _HDDRuns[_storeIdx++] = run;
             // Increment readIdx
             _readIdx += numRuns;
             delete tree;
         }
 
         _count = _storeIdx;
-        _fileBackedRuns.erase(_fileBackedRuns.begin() + _storeIdx, _fileBackedRuns.end());
+        _HDDRuns.erase(_HDDRuns.begin() + _storeIdx, _HDDRuns.end());
     } 
-    _tree = new LoserTree(_fileBackedRuns, _fileBackedRuns.size());
-    }
+    _tree = new LoserTree(_HDDRuns, _HDDRuns.size());
+    
 }
 
 void MultiStageLoserTree::flushCacheRuns(){
@@ -226,7 +237,7 @@ void MultiStageLoserTree::flushCacheRuns(){
         }
         else {
             if (*r <= *_last) {
-                throw std::runtime_error("sldkdkfjsldfjs;fsdjfl\n");
+                throw std::runtime_error("heheh\n");
             }
             *_last = *r;
         }
@@ -237,9 +248,45 @@ void MultiStageLoserTree::flushCacheRuns(){
     }
     //store the FileBackedRun in the Vector
     run->harden();
-    _fileBackedRuns.push_back(run);
+    _SSDRuns.push_back(run);
+     if(_SSDRuns.size()>_fanOutHDD){
+        flushSSDRuns();
+    }    
 
     _cacheOfRuns.clear();
+
+    _first = true;
+    delete tree;
+}
+
+void MultiStageLoserTree::flushSSDRuns(){
+    LoserTree *tree = new LoserTree(_SSDRuns, _SSDRuns.size());
+    // Read out the sorted results to a file-backed run
+    DynamicRun *run = new DynamicRun(_state,_state->_hdd_page_size, _SSDRuns[0]->_rowSize);
+    Record *r = tree->next();
+    // Temp pointer to enable OVC calculation
+    while(r != nullptr) {
+        if (_first) {
+            _first = false;
+            *_last = *r;
+        }
+        else {
+            if (*r <= *_last) {
+                throw std::runtime_error("sadflksadflksdaj;\n");
+            }
+            *_last = *r;
+        }
+        // Put Record on Run
+        // std::cout<<*r<<"\n";
+        run->push(r);
+        r = tree->next();
+    }
+    //store the FileBackedRun in the Vector
+    run->harden();
+    _HDDRuns.push_back(run);
+
+
+    _SSDRuns.clear();
 
     _first = true;
     delete tree;

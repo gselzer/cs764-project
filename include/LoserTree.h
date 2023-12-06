@@ -31,11 +31,17 @@ public:
     void append(DynamicRun *run);
     void reduce();
     void flushCacheRuns();
+    void flushSSDRuns();
+
+   
+   
 
 private:
     float _fanOutSSD = 0.95 * CACHE_SIZE / (CPU_CACHE_SIZE);
+    float _fanOutHDD = 100; //Each SSD Run of 95 MB . MERGING A 100 will gIve us 9.5 GB (slightly less than 10 GB)i.e the SSD Capacity
     std::vector <DynamicRun*> _cacheOfRuns;
-    std::vector <DynamicRun *> _fileBackedRuns;
+    std::vector <DynamicRun *> _HDDRuns;
+    std::vector <DynamicRun *> _SSDRuns;
     RunStorageState *_state;
     LoserTree *_tree;
     size_t _recordSize;

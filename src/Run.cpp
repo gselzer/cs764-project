@@ -178,9 +178,9 @@ RunStorageState::~RunStorageState() {
 }
 
 // Returns true iff "written to SSD"
-bool RunStorageState::write(const int noBytes) {
+void RunStorageState::write(const int noBytes, const int _pageSize) {
    
-    if (_ssdAllocated + noBytes <= _ssd_size ) {
+    if (_pageSize == _ssd_page_size ) {
          std::cout<<_ssdAllocated<<" / "<<_ssd_size<<"  - SSD State\n";
         // Write out to SSD
         std::cout << "Writing " << noBytes << " bytes to SSD\n";
@@ -188,7 +188,7 @@ bool RunStorageState::write(const int noBytes) {
         float transferTime = static_cast<float>(noBytes) / _ssd_bandwidth;
         _ssdTime += _ssd_latency + transferTime;
         _ssdAllocated += noBytes;
-        return true;
+       
     }
     else {
         // Write out to HDD
@@ -197,12 +197,12 @@ bool RunStorageState::write(const int noBytes) {
         float transferTime = static_cast<float>(noBytes) / _hdd_bandwidth;
         _hddTime += _hdd_latency + transferTime;
         _hddAllocated += noBytes;
-        return false;
+        
     }
 }
 
-void RunStorageState::read(const int noBytes, const bool readFromSSD) {
-    if (readFromSSD) {
+void RunStorageState::read(const int noBytes, const int pageSize) {
+    if (pageSize == _ssd_page_size) {
         // Write out to SSD
         std::cout << "Reading " << noBytes << " bytes from SSD\n";
         float transferTime = static_cast<float>(noBytes) / _ssd_bandwidth;
@@ -210,7 +210,7 @@ void RunStorageState::read(const int noBytes, const bool readFromSSD) {
 
         _ssdAllocated -= noBytes;
     }
-    else {
+    else if(pageSize == _hdd_page_size) {
         // Write out to HDD
         std::cout << "Reading " << noBytes << " bytes from HDD\n";
         float transferTime = static_cast<float>(noBytes) / _hdd_bandwidth;
@@ -306,9 +306,11 @@ DynamicRun::DynamicRun(RunStorageState *state, size_t pageSize, size_t rowSize):
 }
 
 DynamicRun::~DynamicRun() {
+    _state->read(_produce_idx * _recordSize, _pageSize );
     delete _last;
     delete[] _records;
     delete[] _rows;
+    
 }
 
 void DynamicRun::push(Record *r) {
@@ -355,7 +357,7 @@ Record* DynamicRun::peek() {
         if (_readRemaining == 0) {
             _readRemaining += std::fread(_records, sizeof(Record), _maxRecords, file);
             std::fread(_rows, sizeof(char), 3 * _maxRecords * _rowSize, file);
-            std::cout << "Read in " << _maxRecords << " records from the file\n";
+            // std::cout << "Read in " << _maxRecords << " records from the file\n";
         }
         return _records + (_consume_idx % _maxRecords);
     }
@@ -368,7 +370,7 @@ Record *DynamicRun::pop() {
             _readRemaining += std::fread(_records, sizeof(Record), _maxRecords, file);
             std::fread(_rows, sizeof(char), 3 * _maxRecords * _rowSize, file);
             int totalBytes = (sizeof(Record) * _maxRecords) + (sizeof(char) * 3 * _maxRecords * _rowSize);
-            std::cout << "Read in " << _maxRecords << " records from the file\n";
+            // std::cout << "Read in " << _maxRecords << " records from the file\n";
 
         }
         int srcIndex = _consume_idx % _maxRecords;
@@ -415,7 +417,7 @@ void DynamicRun::harden() {
     std::cout << "Writing out " << _produce_idx << " Records to file\n";
     std::fwrite(_records, sizeof(Record), _maxRecords, file);
     std::fwrite(_rows, sizeof(char), 3 * _maxRecords * _rowSize, file);
-    _onSSD = _state->write(_produce_idx * _recordSize);
+    _state->write(_produce_idx * _recordSize, _pageSize);
 
     rewind(file);
 }
