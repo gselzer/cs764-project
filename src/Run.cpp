@@ -178,7 +178,7 @@ RunStorageState::~RunStorageState() {
 }
 
 // Returns true iff "written to SSD"
-void RunStorageState::write(const int noBytes, const int _pageSize) {
+void RunStorageState::write(const uint64_t noBytes, const int _pageSize) {
    
     if (_pageSize == _ssd_page_size ) {
          std::cout<<_ssdAllocated<<" / "<<_ssd_size<<"  - SSD State\n";
@@ -195,27 +195,29 @@ void RunStorageState::write(const int noBytes, const int _pageSize) {
         std::cout << "Writing " << noBytes << " bytes to HDD\n"; 
         std::cout<<_hddAllocated<<" / "<< "Inf  - HDD State\n";   
         float transferTime = static_cast<float>(noBytes) / _hdd_bandwidth;
+        if(transferTime < 0){
+            std::cout<<"Transfer time is negative\n";
+        }
         _hddTime += _hdd_latency + transferTime;
         _hddAllocated += noBytes;
         
     }
 }
 
-void RunStorageState::read(const int noBytes, const int pageSize) {
+void RunStorageState::read(const uint64_t noBytes, const int pageSize) {
     if (pageSize == _ssd_page_size) {
         // Write out to SSD
         std::cout << "Reading " << noBytes << " bytes from SSD\n";
         float transferTime = static_cast<float>(noBytes) / _ssd_bandwidth;
         _ssdTime += _ssd_latency + transferTime;
-
         _ssdAllocated -= noBytes;
     }
     else if(pageSize == _hdd_page_size) {
+        
         // Write out to HDD
         std::cout << "Reading " << noBytes << " bytes from HDD\n";
         float transferTime = static_cast<float>(noBytes) / _hdd_bandwidth;
         _hddTime += _hdd_latency + transferTime;
-
         _hddAllocated -= noBytes;
     }
 }
@@ -300,6 +302,7 @@ DynamicRun::DynamicRun(RunStorageState *state, size_t pageSize, size_t rowSize):
     _state(state)
 {
     _last = new Record(_recordSize);
+    _lastSSD = new Record(_recordSize);
     _maxRecords =  _pageSize / _recordSize;
     _records = new Record[_maxRecords];
     _rows = new char[3 * _maxRecords * rowSize];
@@ -308,6 +311,7 @@ DynamicRun::DynamicRun(RunStorageState *state, size_t pageSize, size_t rowSize):
 DynamicRun::~DynamicRun() {
     _state->read(_produce_idx * _recordSize, _pageSize );
     delete _last;
+    delete _lastSSD;
     delete[] _records;
     delete[] _rows;
     

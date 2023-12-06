@@ -142,6 +142,7 @@ MultiStageLoserTree::MultiStageLoserTree(RunStorageState *state, size_t recordSi
     _recordSize(recordSize)
 {
     _last = new Record(recordSize);
+    _lastSSD = new Record(recordSize);
 }
 
 MultiStageLoserTree::~MultiStageLoserTree() {
@@ -261,15 +262,15 @@ void MultiStageLoserTree::flushSSDRuns(){
     Record *r = tree->next();
     // Temp pointer to enable OVC calculation
     while(r != nullptr) {
-        if (_first) {
-            _first = false;
-            *_last = *r;
+        if (_firstSSD) {
+            _firstSSD = false;
+            *_lastSSD = *r;
         }
         else {
-            if (*r <= *_last) {
+            if (*r <= *_lastSSD) {
                 throw std::runtime_error("sadflksadflksdaj;\n");
             }
-            *_last = *r;
+            *_lastSSD = *r;
         }
         // Put Record on Run
         // std::cout<<*r<<"\n";
@@ -279,10 +280,9 @@ void MultiStageLoserTree::flushSSDRuns(){
     //store the FileBackedRun in the Vector
     run->harden();
     _HDDRuns.push_back(run);
-
-
+    
     _SSDRuns.clear();
 
-    _first = true;
+    _firstSSD = true;
     delete tree;
 }

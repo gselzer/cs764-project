@@ -46,5 +46,7 @@ private:
     LoserTree *_tree;
     size_t _recordSize;
     Record *_last;
+    Record *_lastSSD;
     bool _first = true;
+    bool _firstSSD = true;
 }; // class LoserTree

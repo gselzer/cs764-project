@@ -67,6 +67,7 @@ void testDynamicCacheSizedRun(RowCount numRecords, size_t recordSize) {
 	// TODO: Needs to be minimum value
     std::vector<Record*> sorted;
 	Record *_last = new Record(recordSize);
+    
 	for(size_t i = 0; i < rowSize; i++){
 		_last->row1[i] = 0;
 		_last->row2[i] = 0;
@@ -156,10 +157,10 @@ int main(int argc, char *argv[]) {
     
  // Output to trace file
     std::ofstream traceOut(traceFile);
-// //  override the cout stream buffer with a file stream buffer
-//     std::streambuf *cout_buffer = std::cout.rdbuf(); 
-//     // save the current buffer 
-//     std::cout.rdbuf(traceOut.rdbuf()); 
+//  override the cout stream buffer with a file stream buffer
+    std::streambuf *cout_buffer = std::cout.rdbuf(); 
+    // save the current buffer 
+    std::cout.rdbuf(traceOut.rdbuf()); 
     // redirect cout to the output file 
 
     if (traceOut.is_open()) {
@@ -171,7 +172,7 @@ int main(int argc, char *argv[]) {
     //     testDynamicFileSizedRun(numRecords, recordSize);
     // }
         traceOut.close();
-        // std::cout.rdbuf(cout_buffer); 
+        std::cout.rdbuf(cout_buffer); 
         // restore the original cout buffer 
     } else {
         std::cerr << "Failed to open trace file: " << traceFile << "\n";

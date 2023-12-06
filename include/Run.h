@@ -41,8 +41,8 @@ class RunStorageState
 	public:
 	RunStorageState();
 	~RunStorageState();
-	void write(const int noBytes, const int pageSize);
-	void read(const int noBytes, const int pageSize);
+	void write(const uint64_t noBytes, const int pageSize);
+	void read(const uint64_t noBytes, const int pageSize);
 	const float _ssd_latency = 0.0001; // 0.1 ms
 	const float _hdd_latency = 0.01; // 10 ms
 	const int _ssd_bandwidth = 100 * (2 << 19); // 100 MB/s
@@ -106,4 +106,5 @@ private:
     RunStorageState *_state;
     // bool _onSSD; 
     Record *_last;
+    Record *_lastSSD;
 }; // class DynamicRun
