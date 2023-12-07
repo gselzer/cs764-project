@@ -1,98 +1,55 @@
+#include "defs.h"
 #include "Sort.h"
-#include <vector>
+#include <stdlib.h>
 #include <iostream>
+#include <vector>
 
-// Merge function for merge sort
-void merge(std::vector<Record*>& records, int l, int m, int r) {
-    std::cout<<"Merging "<<r - l + 1<<" records\n";
-    int n1 = m - l + 1;
-    int n2 = r - m;
 
-    std::vector<Record*> L(n1), R(n2);
+ExternalMergeSortPlan::ExternalMergeSortPlan(Plan* input) : _input(input) {}
 
-    for (int i = 0; i < n1; i++)
-        L[i] = records[l + i];
-    for (int j = 0; j < n2; j++)
-        R[j] = records[m + 1 + j];
-
-    int i = 0;
-    int j = 0;
-    int k = l;
-
-    while (i < n1 && j < n2) {
-        if (L[i] <= R[j]) {
-            records[k] = L[i];
-            i++;
-        }
-        else {
-            records[k] = R[j];
-            j++;
-        }
-        k++;
-    }
-
-    while (i < n1) {
-        records[k] = L[i];
-        i++;
-        k++;
-    }
-
-    while (j < n2) {
-        records[k] = R[j];
-        j++;
-        k++;
-    }
+ExternalMergeSortPlan::~ExternalMergeSortPlan() {
 }
 
-// In-memory merge sort
-void SortIterator::sort(std::vector<Record*>& records) {
-    int n = records.size();
-    for (int curr_size = 1; curr_size <= n - 1; curr_size = 2 * curr_size) {
-        for (int left_start = 0; left_start < n - 1; left_start += 2 * curr_size) {
-            int mid = std::min(left_start + curr_size - 1, n - 1);
-            int right_end = std::min(left_start + 2 * curr_size - 1, n - 1);
-            merge(records, left_start, mid, right_end);
-        }
-    }
+Iterator* ExternalMergeSortPlan::init() const {
+    return new ExternalMergeSortIterator(this);
 }
 
-SortPlan::SortPlan(Plan* input) : _input(input) {}
-
-SortPlan::~SortPlan() {
-    delete _input;
-}
-
-Iterator* SortPlan::init() const {
-    return new SortIterator(this);
-}
-
-SortIterator::SortIterator(const SortPlan* plan) 
+ExternalMergeSortIterator::ExternalMergeSortIterator(const ExternalMergeSortPlan* plan) 
     : _plan(plan), 
       _input(_plan->_input->init()),  
       _currentIdx(0)
 {
-    std::vector<Record*> records;
-    Record* record = _input->next();
-    while (record != nullptr) {
-        records.push_back(record);
-        record = _input->next();
-    }
-    std::cout<<"In-Memory : Sorting "<<records.size()<<" records\n";
-    sort(records);
-    _sortedRecords.swap(records);
+    // Step 1: Create Runs
+    std::vector<Run*> records;
+    Record *r;
+    r = _input->next();
+
+    _state = new RunStorageState();
+    _tree = new MultiStageLoserTree(_state, r->size());
+    while (r != nullptr) {
+        DynamicRun *run = new DynamicRun(_state,CPU_CACHE_SIZE,r->columnSize);
+        // Fill in the run array
+        for (uint64_t i = 0; i < run->maxRecords; i++) {
+            run->push(r);
+            r = _input->next();
+        }
+        run->sort();
+        run->readRemaining = run->maxRecords;
+        _tree->append(run);
+    } 
+    _tree->reduce();
+    
 }
 
-SortIterator::~SortIterator() {
+ExternalMergeSortIterator::~ExternalMergeSortIterator() {
+    TRACE(false);
     delete _input;
-    for (Record* record : _sortedRecords) {
-        delete record;
-    }
+    delete _state;
+    delete _tree;
 }
 
-Record* SortIterator::next() {
-    if (_currentIdx < _sortedRecords.size()) {
-        return _sortedRecords[_currentIdx++];
-    } else {
-        return nullptr;
-    }
+Record* ExternalMergeSortIterator::next() {
+    return _tree->next();
 }
+
+

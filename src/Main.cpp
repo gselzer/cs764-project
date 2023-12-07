@@ -1,6 +1,6 @@
 #include "../include/Iterator.h"
 #include "../include/Scan.h"
-#include "../include/ExternalMergeSort.h"
+#include "../include/Sort.h"
 #include "../include/Filter.h"
 #include "../include/VerifyOrder.h"
 #include "../include/VerifyContent.h"
