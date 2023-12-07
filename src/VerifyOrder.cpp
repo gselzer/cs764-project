@@ -44,7 +44,7 @@ Record* VerifyOrderIterator::next ()
     TRACE (false);
 	Record *r = _input->next();
 	if (_produced == 0) {
-		std::cout << "Setting the Start Record\n";
+		// std::cout << "Setting the Start Record\n";
 		*_last = *r;
 	}
 	if (r != nullptr) {
