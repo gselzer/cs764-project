@@ -10,41 +10,44 @@
 
 The implementation can be found in `Run.cpp`, at the very end of the file. The functionality has been commented out as we now use quicksort instead, however we have preserved it for grading purposes. The CPU Cache Merge sort sorts groups of Records such that the total number of bytes in the sort fits within the CPU Cache. We specifically use less space than the given amount to leave space for e.g. Instructions, other objects, etc.
 
-### External Merge Sort - Implemented by Gabe and Nitigya (Rafael and Sweksha advised on call)
+### External Merge Sort - Implemented by Gabriel and Nitigya (Rafael and Sweksha advised on call)
 The external merge sort lives in `LoserTree.cpp`. The `LoserTree` class is responsible for producing a sorted stream of `Record`s given a set of `Run` objects. The `MultiStageLoserTree` class makes use of many levels of `LoserTree` objects as `Record`s are inducted into the sort, and as `Record`s are spilled, first to the SSD and then to the HDD.
 
 ### Executable Compilation - Implemented by Nitigya
-Made the entire refactor into different folders for header files and cpp files. In addition Generated additional code in addition to the starter code by implementing Unit Testings for Scan and Sort. In additon implemented the Main Function which created the entire trace files and Controls the Control Variable.
+Made the entire refactor into different folders for header files and cpp files. In addition Generated additional code in addition to the starter code by implementing Unit Testings for Scan and Sort. In additon implemented the Main Function created, takes in Command line arguments for `Number of Records`, `Size of the records` and `Filename for Output text files` and writes data onto the entire trace file. 
+
+
+The trace file Contains Data About the records and size that the project is sorting, The State of the SSD & HDD , The HDD and SSD Total Time and the State Changes between DRAM and Splilling between SSD and HDD. 
 
 ### Quicksort - Implemented by Rafael and Sweksha
 
 This implementation can be found in `DynamicRun::sort`, within `Run.cpp`.
 
-### Tournament Trees - Implemented by Gabe
+### Tournament Trees - Implemented by Gabriel
 
 The implementation can be found in `LoserTree.cpp`, within the `LoserTree` class.
 
-### Verification of Record Content and Order - Implemented by Gabe
+### Verification of Record Content and Order - Implemented by Gabriel
 
 The content verification plan/iterator live in `VerifyContent.cpp.` and make use of the `xor` operation to ensure equal content. A single `Record` object is used to efficiently `xor` each scanned `Record` as it enters the sort; all `Record`s are again `xor`ed as they leave the sort. A `RowCount` object is used to keep track of the number of `Record`s that have been seen before the sort but not after the sort - therefore, we ensure that when we are done with the sort, we have seen both the same number of `Record`s before and after the sort, and the same content.
 
 The order verification plan/iterator live in VerifyOrder.cpp. The `Iterator` makes use of a single `Record` object, which is used to keep track of the prior value it saw, and in every `VerifyOrderIterator::next` call we (1) assert that the returned `Record` is less than the `Record` before and (2) update the last `Record` seen to be the newly returned `Record`.
 
-### Offset Value Coding - Implemented by Gabe and Nitigya (Rafael and Sweksha advised on call)
+### Offset Value Coding - Implemented by Gabriel and Nitigya (Rafael and Sweksha advised on call)
 The offset value codes can be found as state of the `Record` class, in `Record.h`. They are used within `LoserTree::buildTree` and `LoserTree::replayGame`, both in `LoserTree.cpp`. They are calculated after the initial quicksort of the cache-sized runs, in `DynamicRun::sort` (in `Run.cpp`), and are updated as needed within the `LoserTree` class.
 
-### Cache Sized Miniruns - Implemented by Gabe (Rafael and Sweksha advised on call)
+### Cache Sized Miniruns - Implemented by Gabriel (Rafael and Sweksha advised on call)
 
 Cache-sized Miniruns are created in `ExternalMergeSortIterator::next` (within `Sort.cpp`). These runs originally made use of the internal merge sort algorithm implemented by Nitigya, but were converted to use quicksort once implemented by Rafael and Sweksha as descripted above.
 
 ### Minimum Count of Row & Column Comparisons
 This requirement is satisfied by the use of Offset Value Coding within the Tournament Trees, which was shown in class to guarantee a bounded number of row & column comparisons. Please see those sections for their locations. 
 
-### Dynamically Sized Records - Implemented by Gabe and Nitigya, initial coding by Rafael and Sweksha
+### Dynamically Sized Records - Implemented by Gabriel and Nitigya, initial coding by Rafael and Sweksha
 This requirement is satisfied by the `char[]` objects within the `Record` class (in `Record.h`). In practice, given a prescribed `Record` size (in the number of bytes)
 
-### Spilling (Memory to SSD), (SSD to HDD) - Implemented by Gabe and Nitigya, (Rafael advised on call)
-### Device-Optimized Page Sizes - Implemented by Nitigya
+### Spilling (Memory to SSD), (SSD to HDD) - Implemented by Gabriel and Nitigya, (Rafael advised on call)
+### Device-Optimized Page Sizes - Implemented by Nitigya and Gabriel
 This requirement is satisfied by the `pageSize` argument of the `DynamicRun` constructor. In `ExternalMergeSortIterator::next` (within `Sort.cpp`), CPU-Cache Sized pages (we actually use 500KB deliberately instead of 1MB to allow room in the CPU cache for instructions, quicksort data, etc) are created and held in DRAM until the DRAM is (nearly) full. At that point, we create a `DynamicRun` with a page size equivalent to the SSD `latency * bandwidth`, which was shown in class to be nearly optimal, to flush our CPU-sized Runs to SSD - this flushing happens in `MultiStageLoserTree::flushCacheRuns` (within `LoserTree.cpp`). That `DynamicRun` writes to file in increments of the SSD page size. Finally, once the SSD is (nearly) full, we create a new `DynamicRun` object with a page size equivalent ot the HDD `latency * bandwidth`, to flush our HDD size Runs to HDD - this flusing happens in `MultiStageLoserTree::flushSSDRuns` (within `LoserTree.cpp`).
 
 ### Exception Handling - Implemented by Sweksha and Rafael
