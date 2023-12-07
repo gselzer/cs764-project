@@ -75,9 +75,6 @@ void LoserTree::replayGame(int idx, int prevWinner) {
         loser = prevWinner;
     } else if (rl->leOVC(rw)) {
         // std::cout << "Previous Loser " << *rl << " beat out Previous Winner " <<  *rw << "\n";
-        // if(rl->leOVC(rw)){
-
-        // }
         rw->encodeOVC(rl);
         winner = prevLoser;
         loser = prevWinner;
@@ -153,7 +150,6 @@ Record *MultiStageLoserTree::next() {
 }
 
 void MultiStageLoserTree::append(DynamicRun *run ) {
-    // float _fanOut = 0.9 * CACHE_SIZE / ;
     _cacheOfRuns.push_back(run);
     if(_cacheOfRuns.size()>_fanOutSSD){
         flushCacheRuns();
@@ -161,10 +157,6 @@ void MultiStageLoserTree::append(DynamicRun *run ) {
 }
 
 void MultiStageLoserTree::reduce() {
-    // TODO: Delete all of the old runs!
-    // if(_cacheOfRuns.size()>0){
-    //    
-    // }
     if(_cacheOfRuns.size()<_fanOutSSD && _SSDRuns.size()==0 && _HDDRuns.size()==0){
         std::cout<<"As Number of Records are low so no need to Spill to Disk\n";
         _tree = new LoserTree(_cacheOfRuns, _cacheOfRuns.size());
@@ -173,11 +165,11 @@ void MultiStageLoserTree::reduce() {
     
     else{
           if(_cacheOfRuns.size()>0){
-            std::cout<<"Flushing Cache Runs\n";
+            // std::cout<<"Flushing Cache Runs\n";
                 flushCacheRuns();
           }
             if(_SSDRuns.size()>0){
-            std::cout<<"Flushing SSD Runs\n";
+            // std::cout<<"Flushing SSD Runs\n";
                 flushSSDRuns();
           }
     int _count = _HDDRuns.size();
@@ -193,7 +185,6 @@ void MultiStageLoserTree::reduce() {
             std::vector<DynamicRun *> subVector (_HDDRuns.begin() + _readIdx, _HDDRuns.begin() + _readIdx + numRuns);
             LoserTree *tree = new LoserTree(subVector, numRuns);
             // Read out the sorted results to a file-backed run
-            //TO DO : Make HDD great again
             DynamicRun *run = new DynamicRun(_state,_state->_hdd_page_size, recordSize);
             Record *r = tree->next();
             // Temp pointer to enable OVC calculation
