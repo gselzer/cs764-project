@@ -11,6 +11,7 @@ class ExternalMergeSortPlan : public Plan
 public:
 	ExternalMergeSortPlan (Plan * const input);
 	~ExternalMergeSortPlan ();
+	void getCurrentMemoryUsage ();
 	Iterator * init () const;
 private:
 	Plan * _input;
@@ -23,7 +24,10 @@ public:
 	~ExternalMergeSortIterator ();
 	Record* next();
 	void sort(std::vector<Record*>& records);
+	std::vector<Run*> _runsInMemory;
+    void checkResourceThreshold();
 private:
+
 	ExternalMergeSortPlan const * const _plan;
 	Iterator * const _input;
 	RunStorageState *_state;
@@ -31,4 +35,6 @@ private:
     size_t _currentIdx;  // New Addition
 	Run *_runs;
 	MultiStageLoserTree *_tree;
+	const int _maxRunsInMemory;
+	bool _degradedMode;
 }; // class ExternalMergeSortIterator

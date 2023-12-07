@@ -286,3 +286,66 @@ void MultiStageLoserTree::flushSSDRuns(){
     _firstSSD = true;
     delete tree;
 }
+
+Run* MultiStageLoserTree::discardRun() {
+    // Find the index of the run with the minimum key
+    int minRunIdx = 0;
+    for (int i = 1; i < _runCount; i++) {
+        if (compare(_runs[i]->peek(), _runs[minRunIdx]->peek()) < 0) {
+            minRunIdx = i;
+        }
+    }
+
+    // Remove the run from the internal data structures
+    Run* discardedRun = _runs[minRunIdx];
+    _runs.erase(_runs.begin() + minRunIdx);
+    _runStates.erase(_runStates.begin() + minRunIdx);
+
+    // Update the loser tree structure
+     _tree->removePlayer(minRunIdx + _runCount);
+
+    return discardedRun;
+}
+
+void LoserTree::removePlayer(int playerIndex) {
+    // Check if the player index is valid
+    if (playerIndex < 0 || playerIndex >= _runCount) {
+        std::cout << "Invalid player index." << std::endl;
+        return;
+    }
+
+    // Remove the player from the loser tree
+    _runs[playerIndex] = nullptr;
+
+    // Rebuild the tree
+    buildTree();
+
+    std::cout << "Player at index " << playerIndex << " removed successfully." << std::endl;
+}
+
+int MultiStageLoserTree::compare(const Record* left, const Record* right) {
+
+    if (left->getKey() < right->getKey()) {
+        return -1;
+    } else if (left->getKey() > right->getKey()) {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
+void MultiStageLoserTree::clear()
+{
+    _runs.clear();
+    _runStates.clear();
+    _cacheOfRuns.clear();
+    _HDDRuns.clear();
+    _SSDRuns.clear();
+    _state = nullptr;
+    delete _tree;
+    _tree = nullptr;
+    _last = nullptr;
+    _lastSSD = nullptr;
+    _first = true;
+    _firstSSD = true;
+}

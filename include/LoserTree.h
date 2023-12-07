@@ -12,13 +12,15 @@ public:
     ~LoserTree();
     Record* next();
     Record *_last = nullptr;
+    void removePlayer(int playerIndex);
+
 private:
     void buildTree();
     void replayGame(int idx, int prevWinner);
     void printTree();
-    int _runCount;
     int* _tree;
     Run** _runs;
+    int _runCount;
 }; // class LoserTree
 
 class MultiStageLoserTree
@@ -32,9 +34,17 @@ public:
     void reduce();
     void flushCacheRuns();
     void flushSSDRuns();
+    int _runCount;
+    Run* discardRun();
+    std::vector<Run*> _runs;
+    std::vector<RunStorageState*> _runStates;
+    int compare(const Record* left, const Record* right);
+    void clear();
 
-   
-   
+    std::vector<Run*> getRuns() const {
+        return _runs;
+    }
+
 
 private:
     float _fanOutSSD = 0.95 * CACHE_SIZE / (CPU_CACHE_SIZE);
@@ -49,4 +59,5 @@ private:
     Record *_lastSSD;
     bool _first = true;
     bool _firstSSD = true;
+
 }; // class LoserTree

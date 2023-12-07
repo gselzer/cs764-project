@@ -15,7 +15,6 @@ public:
     void encodeOVC(Record *other);
     bool leOVC(Record *other);
     int size();
-
     Record &operator= (const Record &that);
     bool operator<= (Record& that);
     bool operator== (Record& that);
@@ -24,5 +23,14 @@ public:
     int rowSize;
     int _offset, _value;
     bool _allocated = false;
+    
+
+    std::string getKey() const {
+        std::string key;
+        key += row1;
+        key += row2;
+        key += row3;
+        return key;
+    }
 };
 

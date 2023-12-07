@@ -21,6 +21,8 @@ Record::Record(Record &other) {
     _offset = other._offset;
     _value = other._value;
 	TRACE(false);
+
+	
 }
 
 // Constructor

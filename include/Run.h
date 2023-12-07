@@ -8,7 +8,26 @@ public:
     virtual void push(Record *) = 0;
     virtual Record* peek() = 0;
     virtual Record* pop() = 0;
-}; // class Run
+    
+    Record* next() {
+        if (_records.empty()) {
+            // If no more records in the run, return nullptr
+            return nullptr;
+        }
+
+        // Get the next record from the front of the vector
+        Record* nextRecord = _records.front();
+
+        // Remove the record from the vector
+        _records.erase(_records.begin());
+
+        return nextRecord;
+    }
+
+private:
+    std::vector<Record*> _records; // Holds the records in the run
+};
+ // class Run
 
 class EmptyRun: public Run{ 
 public:
