@@ -15,7 +15,6 @@ private:
     void buildTree();
     void replayGame(int idx, int prevWinner);
     void printTree();
-    void cleanup();
     int _runCount;
     int* _tree;
     Run** _runs;
