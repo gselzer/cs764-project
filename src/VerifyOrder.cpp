@@ -4,7 +4,7 @@
 #include<limits>
 #include<iostream>
 
-VerifyOrderPlan::VerifyOrderPlan (Plan *const input, size_t const recordSize) : _input (input), _recordSize(recordSize)
+VerifyOrderPlan::VerifyOrderPlan (Plan *const input, size_t const recordSize) : _input (input), recordSize(recordSize)
 {
 	TRACE (false);
 } // VerifyOrderPlan::VerifyOrderPlan
@@ -26,7 +26,7 @@ VerifyOrderIterator::VerifyOrderIterator (VerifyOrderPlan const * const plan) :
 	_consumed (0),
 	_produced (0)
 {
-	_last = new Record(plan->_recordSize);
+	_last = new Record(plan->recordSize);
 	TRACE (false);
 } // VerifyOrderIterator::VerifyOrderIterator
 

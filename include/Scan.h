@@ -11,7 +11,7 @@ public:
 	Iterator * init () const;
 private:
 	RowCount const _count;
-	size_t const _recordSize;
+	size_t const recordSize;
 }; // class ScanPlan
 
 class ScanIterator : public Iterator
@@ -23,5 +23,5 @@ public:
 private:
 	ScanPlan const * const _plan;
 	RowCount _count;
-	size_t _recordSize;
+	size_t recordSize;
 }; // class ScanIterator

@@ -2,40 +2,6 @@
 #include "defs.h"
 #include "Record.h"
 
-class Run {
-public:
-    virtual ~Run() {};
-    virtual void push(Record *) = 0;
-    virtual Record* peek() = 0;
-    virtual Record* pop() = 0;
-}; // class Run
-
-class EmptyRun: public Run{ 
-public:
-    void push(Record *);
-    Record* peek();
-    Record* pop();
-};
-
-class CacheSizedRun: public Run {
-public:
-    CacheSizedRun(size_t recordSize);
-    ~CacheSizedRun();
-    void push(Record *);
-    void sort();
-    Record* peek();
-    Record* pop();
-    int bufSize;
-private:
-    void merge(int l, int m, int r);
-    void quicksort(int low, int high);
-    int partition(int low,int high);
-    Record *_records;
-    int _produce_idx;
-    int _consume_idx;
-    size_t _recordSize;
-}; // class Run
-
 class RunStorageState
 {
 	public:
@@ -51,35 +17,26 @@ class RunStorageState
 	const int _hdd_page_size = _hdd_latency * _hdd_bandwidth; // 
 	private:
 	const uint64_t _ssd_size = ((uint64_t) 10 )* (2 << 29); // 10 GB
-
 	uint64_t _ssdAllocated;
     uint64_t _hddAllocated;
 	float _ssdTime;
     float _hddTime;
-    
-};
+}; // class RunStorageState
 
-class FileBackedRun: public Run {
+class Run {
 public:
-    FileBackedRun(RunStorageState *state, size_t recordSize);
-    ~FileBackedRun();
+    virtual ~Run() {};
+    virtual void push(Record *) = 0;
+    virtual Record* peek() = 0;
+    virtual Record* pop() = 0;
+}; // class Run
+
+class EmptyRun: public Run{ 
+public:
     void push(Record *);
-    void harden();
     Record* peek();
     Record* pop();
-private:
-    std::FILE *file;
-    Record *buffer;
-    int _produce_idx;
-    int _consume_idx;
-    int _readRemaining;
-    Record *_last;
-    RunStorageState *_state;
-    bool _onSSD; 
-    int _bufSize;
-    size_t _recordSize;
-    int _s;
-}; // class FileBackedRun
+}; // class EmptyRun
 
 class DynamicRun: public Run {
 public:
@@ -90,10 +47,10 @@ public:
     Record* pop();
     void sort();
     void harden();
-    size_t _maxRecords;
-    int _readRemaining;
-    size_t _rowSize;
-    size_t _recordSize;
+    size_t maxRecords;
+    int readRemaining;
+    size_t colSize;
+    size_t recordSize;
 private:
     void quicksort(int low, int high, Record &tmp);
     int partition(int low,int high, Record &tmp);
@@ -104,7 +61,49 @@ private:
     int _produce_idx;
     int _consume_idx;
     RunStorageState *_state;
-    // bool _onSSD; 
     Record *_last;
     Record *_lastSSD;
 }; // class DynamicRun
+
+// Stale classes, kept for historical reasons.
+
+// class CacheSizedRun: public Run {
+// public:
+//     CacheSizedRun(size_t recordSize);
+//     ~CacheSizedRun();
+//     void push(Record *);
+//     void sort();
+//     Record* peek();
+//     Record* pop();
+//     int bufSize;
+// private:
+//     void merge(int l, int m, int r);
+//     void quicksort(int low, int high);
+//     int partition(int low,int high);
+//     Record *_records;
+//     int _produce_idx;
+//     int _consume_idx;
+//     size_t recordSize;
+// }; // class Run
+
+// class FileBackedRun: public Run {
+// public:
+//     FileBackedRun(RunStorageState *state, size_t recordSize);
+//     ~FileBackedRun();
+//     void push(Record *);
+//     void harden();
+//     Record* peek();
+//     Record* pop();
+// private:
+//     std::FILE *file;
+//     Record *buffer;
+//     int _produce_idx;
+//     int _consume_idx;
+//     int readRemaining;
+//     Record *_last;
+//     RunStorageState *_state;
+//     bool _onSSD; 
+//     int _bufSize;
+//     size_t recordSize;
+//     int _s;
+// }; // class FileBackedRun

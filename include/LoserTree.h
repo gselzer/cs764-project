@@ -39,5 +39,5 @@ private:
     std::vector <DynamicRun *> _SSDRuns;
     RunStorageState *_state;
     LoserTree *_tree;
-    size_t _recordSize;
+    size_t recordSize;
 }; // class LoserTree

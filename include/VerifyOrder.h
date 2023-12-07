@@ -12,7 +12,7 @@ public:
 	Iterator * init () const;
 private:
 	Plan * _input;
-	size_t _recordSize;
+	size_t recordSize;
 }; // class VerifyOrderPlan
 
 class VerifyOrderIterator : public Iterator

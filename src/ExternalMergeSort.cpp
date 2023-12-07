@@ -29,12 +29,12 @@ ExternalMergeSortIterator::ExternalMergeSortIterator(const ExternalMergeSortPlan
     while (r != nullptr) {
         DynamicRun *run = new DynamicRun(_state,CPU_CACHE_SIZE,r->columnSize);
         // Fill in the run array
-        for (uint64_t i = 0; i < run->_maxRecords; i++) {
+        for (uint64_t i = 0; i < run->maxRecords; i++) {
             run->push(r);
             r = _input->next();
         }
         run->sort();
-        run->_readRemaining = run->_maxRecords;
+        run->readRemaining = run->maxRecords;
         // run->harden();
         // records.push_back(run);
         _tree->append(run);

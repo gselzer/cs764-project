@@ -139,7 +139,7 @@ void LoserTree::printTree(){
 
 MultiStageLoserTree::MultiStageLoserTree(RunStorageState *state, size_t recordSize):
     _state(state),
-    _recordSize(recordSize)
+    recordSize(recordSize)
 {}
 
 MultiStageLoserTree::~MultiStageLoserTree() {
@@ -194,7 +194,7 @@ void MultiStageLoserTree::reduce() {
             LoserTree *tree = new LoserTree(subVector, numRuns);
             // Read out the sorted results to a file-backed run
             //TO DO : Make HDD great again
-            DynamicRun *run = new DynamicRun(_state,_state->_hdd_page_size, _recordSize);
+            DynamicRun *run = new DynamicRun(_state,_state->_hdd_page_size, recordSize);
             Record *r = tree->next();
             // Temp pointer to enable OVC calculation
             while(r != nullptr) {
@@ -220,7 +220,7 @@ void MultiStageLoserTree::reduce() {
 void MultiStageLoserTree::flushCacheRuns(){
     LoserTree *tree = new LoserTree(_cacheOfRuns, _cacheOfRuns.size());
     // Read out the sorted results to a file-backed run
-    DynamicRun *run = new DynamicRun(_state,_state->_ssd_page_size, _cacheOfRuns[0]->_rowSize);
+    DynamicRun *run = new DynamicRun(_state,_state->_ssd_page_size, _cacheOfRuns[0]->colSize);
     Record *r = tree->next();
     while(r != nullptr) {
         // Put Record on Run
@@ -242,7 +242,7 @@ void MultiStageLoserTree::flushCacheRuns(){
 void MultiStageLoserTree::flushSSDRuns(){
     LoserTree *tree = new LoserTree(_SSDRuns, _SSDRuns.size());
     // Read out the sorted results to a file-backed run
-    DynamicRun *run = new DynamicRun(_state,_state->_hdd_page_size, _SSDRuns[0]->_rowSize);
+    DynamicRun *run = new DynamicRun(_state,_state->_hdd_page_size, _SSDRuns[0]->colSize);
     Record *r = tree->next();
     while(r != nullptr) {
         // Put Record on Run

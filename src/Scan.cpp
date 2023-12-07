@@ -3,7 +3,7 @@
 #include<iostream>
 #include<cstdlib>
 
-ScanPlan::ScanPlan (RowCount const count, size_t const recordSize) : _count (count), _recordSize(recordSize)
+ScanPlan::ScanPlan (RowCount const count, size_t const recordSize) : _count (count), recordSize(recordSize)
 {
 	TRACE (false);
 } // ScanPlan::ScanPlan
@@ -20,7 +20,7 @@ Iterator * ScanPlan::init () const
 } // ScanPlan::init
 
 ScanIterator::ScanIterator (ScanPlan const * const plan) :
-	_plan (plan), _count (0), _recordSize(plan->_recordSize)
+	_plan (plan), _count (0), recordSize(plan->recordSize)
 {
 	TRACE (false);
 	// TODO: Consider random initialization
@@ -43,7 +43,7 @@ Record* ScanIterator::next ()
         return nullptr; // Stopping condition
     }
     _count++;
-    Record * r = new Record(_recordSize);
+    Record * r = new Record(recordSize);
 	// int s;
 	// for (int i = 0; i < s / 3; i++){
 	// if (r->col1[i] > 100 || r->col2[i] > 100 || r->col3[i] > 100) {
