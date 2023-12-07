@@ -44,11 +44,5 @@ Record* ScanIterator::next ()
     }
     _count++;
     Record * r = new Record(recordSize);
-	// int s;
-	// for (int i = 0; i < s / 3; i++){
-	// if (r->col1[i] > 100 || r->col2[i] > 100 || r->col3[i] > 100) {
-	// 	std::cout << "Erroneous row: " << *r << "\n";
-	// }
-	// }
 	return r;
 }// ScanIterator::next
