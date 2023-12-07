@@ -49,75 +49,6 @@ void sort(RowCount numRecords, size_t recordSize) {
     // std::cout << "SortIterator tests passed.\n";
 }
 
-void testDynamicCacheSizedRun(RowCount numRecords, size_t recordSize) {
-	size_t columnSize = (recordSize - sizeof(Record)) / 3 ;
-
-    // Try a CPU Cache-sized run
-    RunStorageState *state = new RunStorageState();
-    DynamicRun *run = new DynamicRun(state, CPU_CACHE_SIZE, columnSize);
-    std::vector<Record*> recs;
-
-    for(size_t i = 0; i < numRecords; i++) {
-        Record *r = new Record(recordSize);
-        run->push(r);
-        recs.push_back(r);
-    }
-    run->sort();
-    run->harden();
-	// TODO: Needs to be minimum value
-    std::vector<Record*> sorted;
-	Record *_last = new Record(recordSize);
-    
-	for(size_t i = 0; i < columnSize; i++){
-		_last->col1[i] = 0;
-		_last->col2[i] = 0;
-		_last->col3[i] = 0;
-	}
-    for(size_t i = 0; i < numRecords; i++) {
-        Record *r = run->pop();
-        assert(*_last <= *r);
-        *_last = *r;
-        sorted.push_back(r);
-    }
-    assert(nullptr == run->peek());
-    for(size_t i = 0; i < sorted.size(); i++) {
-        bool _found = false;
-        for (size_t j = 0; j < recs.size(); j++){
-            if(*sorted[i] == *recs[j]) {
-                _found = true;
-                break;
-            }
-        }
-        assert(_found);
-    }
-    std::cout << "All tests passed!\n";
-
-
-    delete _last;
-    delete run;
-}
-
-void testDynamicFileSizedRun(RowCount numRecords, size_t recordSize) {
-	size_t columnSize = (recordSize - sizeof(Record)) / 3 ;
-    RunStorageState *state = new RunStorageState();
-    DynamicRun *run = new DynamicRun(state, state->_ssd_page_size, columnSize);
-    // std::vector<Record*> recs;
-    for(size_t i = 0; i < numRecords; i++) {
-        Record *r = new Record(recordSize);
-        // recs.push_back(r);
-        run->push(r);
-    }
-    run->harden();
-    std::vector<Record*> sorted;
-    for(size_t i = 0; i < numRecords; i++) {
-        Record *r = run->pop();
-        // assert(*r == *recs[i]);
-    }
-    assert(nullptr == run->peek());
-    std::cout << "All tests passed!\n";
-    delete run;
-}
-
 int main(int argc, char *argv[]) {
   
     RowCount numRecords = 0;
@@ -149,15 +80,9 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-        // testScanIterator(numRecords);
-        // testLoserTree(numRecords);
-        // testRun(numRecords);
-        // testFileBackedRun(numRecords);
-    
-    
- // Output to trace file
+    // Output to trace file
     std::ofstream traceOut(traceFile);
-//  override the cout stream buffer with a file stream buffer
+    // override the cout stream buffer with a file stream buffer
     std::streambuf *cout_buffer = std::cout.rdbuf(); 
     // save the current buffer 
     std::cout.rdbuf(traceOut.rdbuf()); 
@@ -166,11 +91,6 @@ int main(int argc, char *argv[]) {
     if (traceOut.is_open()) {
         //Main Function Working
         sort(numRecords, recordSize);
-    // if (recordSize * numRecords < CPU_CACHE_SIZE) {
-    //     testDynamicCacheSizedRun(numRecords, recordSize);
-    // } else {
-    //     testDynamicFileSizedRun(numRecords, recordSize);
-    // }
         traceOut.close();
         std::cout.rdbuf(cout_buffer); 
         // restore the original cout buffer 
