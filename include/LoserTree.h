@@ -11,7 +11,6 @@ public:
     LoserTree(std::vector<DynamicRun*>cacheOfRuns, int runCount);
     ~LoserTree();
     Record* next();
-    Record *_last = nullptr;
 private:
     void buildTree();
     void replayGame(int idx, int prevWinner);
@@ -32,10 +31,6 @@ public:
     void reduce();
     void flushCacheRuns();
     void flushSSDRuns();
-
-   
-   
-
 private:
     float _fanOutSSD = 0.95 * CACHE_SIZE / (CPU_CACHE_SIZE);
     float _fanOutHDD = 100; //Each SSD Run of 95 MB . MERGING A 100 will gIve us 9.5 GB (slightly less than 10 GB)i.e the SSD Capacity
@@ -45,8 +40,4 @@ private:
     RunStorageState *_state;
     LoserTree *_tree;
     size_t _recordSize;
-    Record *_last;
-    Record *_lastSSD;
-    bool _first = true;
-    bool _firstSSD = true;
 }; // class LoserTree

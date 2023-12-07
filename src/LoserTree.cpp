@@ -140,10 +140,7 @@ void LoserTree::printTree(){
 MultiStageLoserTree::MultiStageLoserTree(RunStorageState *state, size_t recordSize):
     _state(state),
     _recordSize(recordSize)
-{
-    _last = new Record(recordSize);
-    _lastSSD = new Record(recordSize);
-}
+{}
 
 MultiStageLoserTree::~MultiStageLoserTree() {
     delete _tree;
@@ -225,20 +222,8 @@ void MultiStageLoserTree::flushCacheRuns(){
     // Read out the sorted results to a file-backed run
     DynamicRun *run = new DynamicRun(_state,_state->_ssd_page_size, _cacheOfRuns[0]->_rowSize);
     Record *r = tree->next();
-    // Temp pointer to enable OVC calculation
     while(r != nullptr) {
-        if (_first) {
-            _first = false;
-            *_last = *r;
-        }
-        else {
-            if (*r <= *_last) {
-                throw std::runtime_error("heheh\n");
-            }
-            *_last = *r;
-        }
         // Put Record on Run
-        // std::cout<<*r<<"\n";
         run->push(r);
         r = tree->next();
     }
@@ -251,7 +236,6 @@ void MultiStageLoserTree::flushCacheRuns(){
 
     _cacheOfRuns.clear();
 
-    _first = true;
     delete tree;
 }
 
@@ -260,20 +244,8 @@ void MultiStageLoserTree::flushSSDRuns(){
     // Read out the sorted results to a file-backed run
     DynamicRun *run = new DynamicRun(_state,_state->_hdd_page_size, _SSDRuns[0]->_rowSize);
     Record *r = tree->next();
-    // Temp pointer to enable OVC calculation
     while(r != nullptr) {
-        if (_firstSSD) {
-            _firstSSD = false;
-            *_lastSSD = *r;
-        }
-        else {
-            if (*r <= *_lastSSD) {
-                throw std::runtime_error("sadflksadflksdaj;\n");
-            }
-            *_lastSSD = *r;
-        }
         // Put Record on Run
-        // std::cout<<*r<<"\n";
         run->push(r);
         r = tree->next();
     }
@@ -283,6 +255,5 @@ void MultiStageLoserTree::flushSSDRuns(){
     
     _SSDRuns.clear();
 
-    _firstSSD = true;
     delete tree;
 }
