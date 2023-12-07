@@ -34,7 +34,6 @@ void Assert (bool const predicate,
 
 #define CPU_CACHE_SIZE (2 << 18) // 512KB
 #define CACHE_SIZE 100000000 // 100 MB
-#define PAGE_SIZE 4096
 
 
 // -----------------------------------------------------------------
