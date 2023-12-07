@@ -27,7 +27,7 @@ ExternalMergeSortIterator::ExternalMergeSortIterator(const ExternalMergeSortPlan
     _state = new RunStorageState();
     _tree = new MultiStageLoserTree(_state, r->size());
     while (r != nullptr) {
-        DynamicRun *run = new DynamicRun(_state,CPU_CACHE_SIZE,r->rowSize);
+        DynamicRun *run = new DynamicRun(_state,CPU_CACHE_SIZE,r->columnSize);
         // Fill in the run array
         for (uint64_t i = 0; i < run->_maxRecords; i++) {
             run->push(r);

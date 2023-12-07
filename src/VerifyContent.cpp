@@ -8,13 +8,13 @@ VerifyContentState::VerifyContentState(size_t const recordSize) : _diffSeen(0)
 {
 	_diff = new Record(recordSize);
 	_noDiff = new Record(recordSize);
-	for(int i = 0; i < _diff->rowSize; i++) {
-		_diff->row1[i] = 0;
-		_diff->row2[i] = 0;
-		_diff->row3[i] = 0;
-		_noDiff->row1[i] = 0;
-		_noDiff->row2[i] = 0;
-		_noDiff->row3[i] = 0;
+	for(int i = 0; i < _diff->columnSize; i++) {
+		_diff->col1[i] = 0;
+		_diff->col2[i] = 0;
+		_diff->col3[i] = 0;
+		_noDiff->col1[i] = 0;
+		_noDiff->col2[i] = 0;
+		_noDiff->col3[i] = 0;
 	}
 }
 

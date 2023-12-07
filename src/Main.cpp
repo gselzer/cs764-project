@@ -40,7 +40,7 @@ void sort(RowCount numRecords, size_t recordSize) {
             break;
         }
         // std::cout << "Got a record!\n";
-        // std::cout << i++ << ": " << record->row1[0] << "\n";
+        // std::cout << i++ << ": " << record->col1[0] << "\n";
         delete record;
     }
     
@@ -50,11 +50,11 @@ void sort(RowCount numRecords, size_t recordSize) {
 }
 
 void testDynamicCacheSizedRun(RowCount numRecords, size_t recordSize) {
-	size_t rowSize = (recordSize - sizeof(Record)) / 3 ;
+	size_t columnSize = (recordSize - sizeof(Record)) / 3 ;
 
     // Try a CPU Cache-sized run
     RunStorageState *state = new RunStorageState();
-    DynamicRun *run = new DynamicRun(state, CPU_CACHE_SIZE, rowSize);
+    DynamicRun *run = new DynamicRun(state, CPU_CACHE_SIZE, columnSize);
     std::vector<Record*> recs;
 
     for(size_t i = 0; i < numRecords; i++) {
@@ -68,10 +68,10 @@ void testDynamicCacheSizedRun(RowCount numRecords, size_t recordSize) {
     std::vector<Record*> sorted;
 	Record *_last = new Record(recordSize);
     
-	for(size_t i = 0; i < rowSize; i++){
-		_last->row1[i] = 0;
-		_last->row2[i] = 0;
-		_last->row3[i] = 0;
+	for(size_t i = 0; i < columnSize; i++){
+		_last->col1[i] = 0;
+		_last->col2[i] = 0;
+		_last->col3[i] = 0;
 	}
     for(size_t i = 0; i < numRecords; i++) {
         Record *r = run->pop();
@@ -98,9 +98,9 @@ void testDynamicCacheSizedRun(RowCount numRecords, size_t recordSize) {
 }
 
 void testDynamicFileSizedRun(RowCount numRecords, size_t recordSize) {
-	size_t rowSize = (recordSize - sizeof(Record)) / 3 ;
+	size_t columnSize = (recordSize - sizeof(Record)) / 3 ;
     RunStorageState *state = new RunStorageState();
-    DynamicRun *run = new DynamicRun(state, state->_ssd_page_size, rowSize);
+    DynamicRun *run = new DynamicRun(state, state->_ssd_page_size, columnSize);
     // std::vector<Record*> recs;
     for(size_t i = 0; i < numRecords; i++) {
         Record *r = new Record(recordSize);

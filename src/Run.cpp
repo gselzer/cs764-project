@@ -293,10 +293,10 @@ void RunStorageState::read(const uint64_t noBytes, const int pageSize) {
 // }
 
 
-DynamicRun::DynamicRun(RunStorageState *state, size_t pageSize, size_t rowSize):
+DynamicRun::DynamicRun(RunStorageState *state, size_t pageSize, size_t columnSize):
     _pageSize(pageSize),
-    _rowSize(rowSize),
-    _recordSize(sizeof(Record) + 3 * rowSize),
+    _rowSize(columnSize),
+    _recordSize(sizeof(Record) + 3 * columnSize),
     _produce_idx(0),
     _consume_idx(0),
     _state(state)
@@ -305,7 +305,7 @@ DynamicRun::DynamicRun(RunStorageState *state, size_t pageSize, size_t rowSize):
     _lastSSD = new Record(_recordSize);
     _maxRecords =  _pageSize / _recordSize;
     _records = new Record[_maxRecords];
-    _rows = new char[3 * _maxRecords * rowSize];
+    _rows = new char[3 * _maxRecords * columnSize];
 }
 
 DynamicRun::~DynamicRun() {
@@ -336,18 +336,18 @@ void DynamicRun::push(Record *r) {
     }
     int destIdx = _produce_idx % _maxRecords;
     char* rowIdx = _rows + (destIdx * 3 * _rowSize);
-    memcpy(rowIdx, r->row1, _rowSize);
-    _records[destIdx].row1 = rowIdx;
+    memcpy(rowIdx, r->col1, _rowSize);
+    _records[destIdx].col1 = rowIdx;
 
     rowIdx += _rowSize;
-    memcpy(rowIdx, r->row2, _rowSize);
-    _records[destIdx].row2 = rowIdx;
+    memcpy(rowIdx, r->col2, _rowSize);
+    _records[destIdx].col2 = rowIdx;
 
     rowIdx += _rowSize;
-    memcpy(rowIdx, r->row3, _rowSize);
-    _records[destIdx].row3 = rowIdx;
+    memcpy(rowIdx, r->col3, _rowSize);
+    _records[destIdx].col3 = rowIdx;
 
-    _records[destIdx].rowSize = r->rowSize;
+    _records[destIdx].columnSize = r->columnSize;
     _records[destIdx]._offset = r->_offset;
     _records[destIdx]._value = r->_value;
     _produce_idx++;
@@ -390,9 +390,9 @@ Record *DynamicRun::pop() {
         }
         *_last = *(_records + srcIndex);
 
-        // _last->row1 = rowIdx;
-        // _last->row2 = rowIdx + _rowSize;
-        // _last->row3 = rowIdx + _rowSize + _rowSize;
+        // _last->col1 = rowIdx;
+        // _last->col2 = rowIdx + _rowSize;
+        // _last->col3 = rowIdx + _rowSize + _rowSize;
         _consume_idx++;
         _readRemaining--;
         // return _last;

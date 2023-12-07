@@ -7,15 +7,15 @@ Record::Record() {}
 
 Record::Record(Record &other) {
 	 
-	rowSize = other.rowSize;
+	columnSize = other.columnSize;
 	
-	row1 = new char[rowSize];
-	row2 = new char[rowSize];
-	row3 = new char[rowSize];
+	col1 = new char[columnSize];
+	col2 = new char[columnSize];
+	col3 = new char[columnSize];
 
-	memcpy(row1, other.row1, rowSize);
-	memcpy(row2, other.row2, rowSize);
-	memcpy(row3, other.row3, rowSize);
+	memcpy(col1, other.col1, columnSize);
+	memcpy(col2, other.col2, columnSize);
+	memcpy(col3, other.col3, columnSize);
 	_allocated = true;
 
     _offset = other._offset;
@@ -27,30 +27,30 @@ Record::Record(Record &other) {
 Record::Record(int s) : _offset(-1), _value(-1) {
 	// Divide remaining size by 3
 	// TODO - don't lose remainder!
-	rowSize = (s - sizeof(Record)) / 3 ;
+	columnSize = (s - sizeof(Record)) / 3 ;
 
-	row1 = new char[rowSize];
-	row2 = new char[rowSize];
-	row3 = new char[rowSize];
+	col1 = new char[columnSize];
+	col2 = new char[columnSize];
+	col3 = new char[columnSize];
 	_allocated = true;
 
-	for(int i = 0; i < rowSize - 1; i++) {
-		row1[i] = (char) (rand() % 128);
-		row2[i] = (char) (rand() % 128);
-		row3[i] = (char) (rand() % 128);
+	for(int i = 0; i < columnSize - 1; i++) {
+		col1[i] = (char) (rand() % 128);
+		col2[i] = (char) (rand() % 128);
+		col3[i] = (char) (rand() % 128);
 	}
-	row1[rowSize - 1] = '\0';
-	row2[rowSize - 1] = '\0';
-	row3[rowSize - 1] = '\0';
+	col1[columnSize - 1] = '\0';
+	col2[columnSize - 1] = '\0';
+	col3[columnSize - 1] = '\0';
 
     TRACE(false);
 }
 
 // Constructorc
-Record::Record(char *row1, char *row2, char *row3, int s) : row1(row1), row2(row2), row3(row3), _offset(-1), _value(-1) {
+Record::Record(char *col1, char *col2, char *col3, int s) : col1(col1), col2(col2), col3(col3), _offset(-1), _value(-1) {
 	// Divide remaining size by 3
 	// TODO - don't lose remainder!
-	rowSize = (s - sizeof(Record)) / 3 ;
+	columnSize = (s - sizeof(Record)) / 3 ;
 
     TRACE(false);
 }
@@ -58,44 +58,44 @@ Record::Record(char *row1, char *row2, char *row3, int s) : row1(row1), row2(row
 // Destructor
 Record::~Record() {
 	if (_allocated) {
-		delete[] row1;
-		delete[] row2;
-		delete[] row3;
+		delete[] col1;
+		delete[] col2;
+		delete[] col3;
 	}
 	TRACE(false);
 }
 
 int Record::size() {
-	return 3 * rowSize + sizeof(Record);
+	return 3 * columnSize + sizeof(Record);
 }
 
 bool Record::operator<=(Record& that) {
-	if (rowSize == 0) rowSize = that.rowSize;
+	if (columnSize == 0) columnSize = that.columnSize;
 	// Could maybe be written more simply with conditionals, but conditions are slow supposedly?
-	for(int i = 0; i < rowSize; i++) {
-		if (row1[i] != that.row1[i]) {
-			return row1[i] < that.row1[i];
+	for(int i = 0; i < columnSize; i++) {
+		if (col1[i] != that.col1[i]) {
+			return col1[i] < that.col1[i];
 		}
 	}
-	for(int i = 0; i < rowSize; i++) {
-		if (row2[i] != that.row2[i]) {
-			return row2[i] < that.row2[i];
+	for(int i = 0; i < columnSize; i++) {
+		if (col2[i] != that.col2[i]) {
+			return col2[i] < that.col2[i];
 		}
 	}
-	for(int i = 0; i < rowSize; i++) {
-		if (row3[i] != that.row3[i]) {
-			return row3[i] < that.row3[i];
+	for(int i = 0; i < columnSize; i++) {
+		if (col3[i] != that.col3[i]) {
+			return col3[i] < that.col3[i];
 		}
 	}
 	return true;
 }
 
 Record &Record::operator=(const Record &that) {
-	std::memcpy(row1, that.row1, rowSize);
-	std::memcpy(row2, that.row2, rowSize);
-	std::memcpy(row3, that.row3, rowSize);
+	std::memcpy(col1, that.col1, columnSize);
+	std::memcpy(col2, that.col2, columnSize);
+	std::memcpy(col3, that.col3, columnSize);
 
-	this->rowSize = that.rowSize;
+	this->columnSize = that.columnSize;
 	this->_offset = that._offset;
 	this->_value = that._value;
 
@@ -103,18 +103,18 @@ Record &Record::operator=(const Record &that) {
 }
 
 bool Record::operator==(Record& that) {
-	for(int i = 0; i < rowSize; i++) {
-		if (row1[i] != that.row1[i]) {
+	for(int i = 0; i < columnSize; i++) {
+		if (col1[i] != that.col1[i]) {
 			return false;
 		}
 	}
-	for(int i = 0; i < rowSize; i++) {
-		if (row2[i] != that.row2[i]) {
+	for(int i = 0; i < columnSize; i++) {
+		if (col2[i] != that.col2[i]) {
 			return false;
 		}
 	}
-	for(int i = 0; i < rowSize; i++) {
-		if (row3[i] != that.row3[i]) {
+	for(int i = 0; i < columnSize; i++) {
+		if (col3[i] != that.col3[i]) {
 			return false;
 		}
 	}
@@ -122,15 +122,15 @@ bool Record::operator==(Record& that) {
 }
 
 void Record::operator^=(Record &that) {
-	for (int i = 0; i < rowSize; i++){
-		row1[i] ^= that.row1[i];
-		row2[i] ^= that.row2[i];
-		row3[i] ^= that.row3[i];
+	for (int i = 0; i < columnSize; i++){
+		col1[i] ^= that.col1[i];
+		col2[i] ^= that.col2[i];
+		col3[i] ^= that.col3[i];
 	}
 }
 
 std::ostream& operator<<(std::ostream& os, Record const &r) {
-	os << "Record: [" << r.row1 << ", " << r.row2 << ", " << r.row3 << "] OVC: (" << r._offset << ", " << r._value << ")";
+	os << "Record: [" << r.col1 << ", " << r.col2 << ", " << r.col3 << "] OVC: (" << r._offset << ", " << r._value << ")";
 	return os;
 }
 
@@ -141,29 +141,29 @@ void Record::encodeOVC(Record *other) {
 		_value = 0;
 		return;
 	}
-	for (int i = 0; i < rowSize; i++){
-		if (other->row1[i] < row1[i]) {
+	for (int i = 0; i < columnSize; i++){
+		if (other->col1[i] < col1[i]) {
 			_offset = i + 1;
-			_value = row1[i];
+			_value = col1[i];
 			return;
 		}
 	}
-	for (int i = 0; i < rowSize; i++){
-		if (other->row2[i] < row2[i]) {
-			_offset = rowSize + i + 1;
-			_value = row2[i];
+	for (int i = 0; i < columnSize; i++){
+		if (other->col2[i] < col2[i]) {
+			_offset = columnSize + i + 1;
+			_value = col2[i];
 			return;
 		}
 	}
-	for (int i = 0; i < rowSize; i++){
-		if (other->row3[i] < row3[i]) {
-			_offset = rowSize + rowSize + i + 1;
-			_value = row3[i];
+	for (int i = 0; i < columnSize; i++){
+		if (other->col3[i] < col3[i]) {
+			_offset = columnSize + columnSize + i + 1;
+			_value = col3[i];
 			return;
 		}
 	}
 	// Equal records
-	_offset = 3 * rowSize + 1;
+	_offset = 3 * columnSize + 1;
 	_value = 0;
 }
 
