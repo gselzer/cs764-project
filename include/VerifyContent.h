@@ -14,7 +14,7 @@ public:
 private:
 	Record * _noDiff;
 	Record * _diff;
-	int _diffSeen;
+	RowCount _diffSeen;
 }; // class VerifyContentState
 
 class VerifyContentPlan : public Plan

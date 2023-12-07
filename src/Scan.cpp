@@ -2,6 +2,7 @@
 #include "../include/Record.h"
 #include<iostream>
 #include<cstdlib>
+#include <stdexcept>
 
 ScanPlan::ScanPlan (RowCount const count, size_t const recordSize) : _count (count), recordSize(recordSize)
 {
@@ -39,10 +40,18 @@ ScanIterator::~ScanIterator ()
 Record* ScanIterator::next ()
 {
     TRACE (false);
-    if (_count >= _plan->_count) {
-        return nullptr; // Stopping condition
+	try
+    {
+		if (_count >= _plan->_count) {
+			return nullptr; // Stopping condition
+		}
+		_count++;
+		Record * r = new Record(recordSize);
+		return r;
+	}
+	catch (const std::exception& e)
+	{
+        std::cerr << "Exception occurred: " << e.what() << std::endl;
+        throw;
     }
-    _count++;
-    Record * r = new Record(recordSize);
-	return r;
 }// ScanIterator::next

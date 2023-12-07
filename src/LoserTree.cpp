@@ -9,7 +9,7 @@
 LoserTree::LoserTree(std::vector<DynamicRun*>cacheOfRuns, int runCount){
     // Set up runs array (array of Run pointers)
     _runCount = runCount;
-       
+        
     while(!IsPowerOf2(_runCount)) {
         _runCount++;
     }

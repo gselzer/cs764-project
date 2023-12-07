@@ -6,21 +6,25 @@
 Record::Record() {}
 
 Record::Record(Record &other) {
-	 
-	columnSize = other.columnSize;
-	
-	col1 = new char[columnSize];
-	col2 = new char[columnSize];
-	col3 = new char[columnSize];
+	try {
+		columnSize = other.columnSize;
+		
+		col1 = new char[columnSize];
+		col2 = new char[columnSize];
+		col3 = new char[columnSize];
 
-	memcpy(col1, other.col1, columnSize);
-	memcpy(col2, other.col2, columnSize);
-	memcpy(col3, other.col3, columnSize);
-	_allocated = true;
+		memcpy(col1, other.col1, columnSize);
+		memcpy(col2, other.col2, columnSize);
+		memcpy(col3, other.col3, columnSize);
+		_allocated = true;
 
-    _offset = other._offset;
-    _value = other._value;
-	TRACE(false);
+		_offset = other._offset;
+		_value = other._value;
+		TRACE(false);
+	} catch (const std::exception& e) {
+        std::cerr << "Exception occurred in Record copy constructor: " << e.what() << std::endl;
+        throw;
+    }
 }
 
 // Constructor
@@ -135,48 +139,58 @@ std::ostream& operator<<(std::ostream& os, Record const &r) {
 }
 
 void Record::encodeOVC(Record *other) {
-	// Assume that other < this
-	if (other == nullptr) {
-		_offset = 0;
+	try {
+		// Assume that other < this
+		if (other == nullptr) {
+			_offset = 0;
+			_value = 0;
+			return;
+		}
+		for (int i = 0; i < columnSize; i++){
+			if (other->col1[i] < col1[i]) {
+				_offset = i + 1;
+				_value = col1[i];
+				return;
+			}
+		}
+		for (int i = 0; i < columnSize; i++){
+			if (other->col2[i] < col2[i]) {
+				_offset = columnSize + i + 1;
+				_value = col2[i];
+				return;
+			}
+		}
+		for (int i = 0; i < columnSize; i++){
+			if (other->col3[i] < col3[i]) {
+				_offset = columnSize + columnSize + i + 1;
+				_value = col3[i];
+				return;
+			}
+		}
+		// Equal records
+		_offset = 3 * columnSize + 1;
 		_value = 0;
-		return;
-	}
-	for (int i = 0; i < columnSize; i++){
-		if (other->col1[i] < col1[i]) {
-			_offset = i + 1;
-			_value = col1[i];
-			return;
-		}
-	}
-	for (int i = 0; i < columnSize; i++){
-		if (other->col2[i] < col2[i]) {
-			_offset = columnSize + i + 1;
-			_value = col2[i];
-			return;
-		}
-	}
-	for (int i = 0; i < columnSize; i++){
-		if (other->col3[i] < col3[i]) {
-			_offset = columnSize + columnSize + i + 1;
-			_value = col3[i];
-			return;
-		}
-	}
-	// Equal records
-	_offset = 3 * columnSize + 1;
-	_value = 0;
+	} catch (const std::exception& e) {
+        std::cerr << "Exception occurred in Record encodeOVC(): " << e.what() << std::endl;
+        throw;
+    }
 }
 
 bool Record::leOVC(Record *other) {
-	if(other->_offset == 0 && other->_value == 0 || _offset == 0 && _value == 0) {
+	try {
+		if(other->_offset == 0 && other->_value == 0 || _offset == 0 && _value == 0) {
+			return *this <= *other;
+		}
+		if (_offset != other->_offset) {
+			return _offset > other->_offset;
+		}
+		if (_value != other->_value) {
+			return _value < other->_value;
+		}
 		return *this <= *other;
-	}
-	if (_offset != other->_offset) {
-		return _offset > other->_offset;
-	}
-	if (_value != other->_value) {
-		return _value < other->_value;
-	}
-	return *this <= *other;
+	} catch (const std::exception& e) {
+        std::cerr << "Exception occurred in Record leOVC(): " << e.what() << std::endl;
+        throw;
+    }
 }
 

@@ -5,7 +5,6 @@
 #include <exception>
 #include <cstring>
 
-
 void EmptyRun::push(Record *) {
     //nop
 }
@@ -79,19 +78,28 @@ DynamicRun::DynamicRun(RunStorageState *state, size_t pageSize, size_t columnSiz
     _consume_idx(0),
     _state(state)
 {
+  try {
     _last = new Record(recordSize);
     _lastSSD = new Record(recordSize);
     maxRecords =  _pageSize / recordSize;
     _records = new Record[maxRecords];
     _rows = new char[3 * maxRecords * columnSize];
+  } catch (const std::bad_alloc &) {
+    // Handle memory allocation failure gracefully
+    std::cerr << "Failed to allocate memory for _records.";
+  }
 }
 
 DynamicRun::~DynamicRun() {
-    _state->read(_produce_idx * recordSize, _pageSize );
-    delete _last;
-    delete _lastSSD;
-    delete[] _records;
-    delete[] _rows;
+    try {
+        _state->read(_produce_idx * recordSize, _pageSize );
+        delete _last;
+        delete _lastSSD;
+        delete[] _records;
+        delete[] _rows;
+    } catch (const std::exception &e) {
+        std::cerr << "Exception occurred during destruction: " << e.what() << std::endl;
+    }
     
 }
 
@@ -166,23 +174,27 @@ Record *DynamicRun::pop() {
 // function is called, Records should not be popped, and after this function
 // is called, Records should not be pushed.
 void DynamicRun::harden() {
-    // TODO: Can the if be removed and the else just always happen?
-    if (_produce_idx < maxRecords) {
-        readRemaining = _produce_idx;
-        return;
-    }
-    else {
-        readRemaining = 0;
-    }
-    if (file == nullptr) {
-        file = std::tmpfile();
-    }
-    std::cout << "Writing out " << _produce_idx << " Records to file\n";
-    std::fwrite(_records, sizeof(Record), maxRecords, file);
-    std::fwrite(_rows, sizeof(char), 3 * maxRecords * colSize, file);
-    _state->write(_produce_idx * recordSize, _pageSize);
+    try {
+        // TODO: Can the if be removed and the else just always happen?
+        if (_produce_idx < maxRecords) {
+            readRemaining = _produce_idx;
+            return;
+        }
+        else {
+            readRemaining = 0;
+        }
+        if (file == nullptr) {
+            file = std::tmpfile();
+        }
+        std::cout << "Writing out " << _produce_idx << " Records to file\n";
+        std::fwrite(_records, sizeof(Record), maxRecords, file);
+        std::fwrite(_rows, sizeof(char), 3 * maxRecords * colSize, file);
+        _state->write(_produce_idx * recordSize, _pageSize);
 
-    rewind(file);
+        rewind(file);
+    } catch (const std::exception &e) {
+    std::cerr << "Exception occurred during hardening: " << e.what() << std::endl;
+    }
 }
 
 void DynamicRun::sort() {
@@ -195,17 +207,22 @@ void DynamicRun::sort() {
     if (_produce_idx < 2) {
         return;
     }
-    
-    // Declare the quicksort function
-    Record *tmp = new Record(3 * colSize + sizeof(Record));
-    quicksort(0, n - 1, *tmp);
-    delete tmp;
+    try {
+        
+        // Declare the quicksort function
+        Record *tmp = new Record(3 * colSize + sizeof(Record));
+        quicksort(0, n - 1, *tmp);
+        delete tmp;
 
 
-    // Step 2: Encode offset value
-    _records[0].encodeOVC(nullptr);
-    for (int i = 1; i < _produce_idx; i++) {
-        _records[i].encodeOVC(_records + i - 1);
+        // Step 2: Encode offset value
+        _records[0].encodeOVC(nullptr);
+        for (int i = 1; i < _produce_idx; i++) {
+            _records[i].encodeOVC(_records + i - 1);
+        }
+    } catch (const std::exception &e) {
+        // Handle exception gracefully
+        std::cerr << "Exception occurred during sorting: " << e.what() << std::endl;
     }
 }
 
