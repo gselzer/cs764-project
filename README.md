@@ -59,6 +59,8 @@ The work for this project was largely driven by the desire to enable a 120 GB so
 
 The project state is mostly complete. We know that we can run three of the four "graded" sort operations. The largest sort operation (`120GB`), throws a segmentation fault when approximately 80GB of data is spilled to the HDD.
 
+We also are aware that running `./sort` on the CSL instructional machines causes our `VerifyOrderIterator` to throw an `AssertionError` around a sort size of approximately 8GB - we know that `./sort -c 7900000 -s 1000 -o task.txt` and all tested sort sized below pass our iterators but `./sort -c 7950000 -s 1000 -o task.txt` and all tested sort sizes above throw the assertion error with a segmentation fault. Because the code path does not change at this sort size, **and because we can sort 12GB on our linux and macOS machines successfully**, we believe this may be a limitation imposed by the machines on students' operations within the CSL machines. If you encounter this error while grading our project, please let us know and we'd be happy to work around it.
+
 Running the program can be accomplished using the syntax requested in the assignment description:
 
 ```bash
