@@ -160,18 +160,31 @@ void MultiStageLoserTree::reduce() {
     if(_cacheOfRuns.size()<_fanOutSSD && _SSDRuns.size()==0 && _HDDRuns.size()==0){
         std::cout<<"As Number of Records are low so no need to Spill to Disk\n";
         _tree = new LoserTree(_cacheOfRuns, _cacheOfRuns.size());
-        
+        return;
+    }
+    if(_cacheOfRuns.size()>0){
+    // std::cout<<"Flushing Cache Runs\n";
+        flushCacheRuns();
+    }
+    if(_SSDRuns.size()<_fanOutHDD && _HDDRuns.size()==0){
+        std::cout<<"Records fit within SSD - no need to Spill to HDD!\n";
+        _tree = new LoserTree(_SSDRuns, _SSDRuns.size());
+        return;
+    }
+    if(_SSDRuns.size()>0){
+        // std::cout<<"Flushing SSD Runs\n";
+        flushSSDRuns();
     }
     
-    else{
-          if(_cacheOfRuns.size()>0){
-            // std::cout<<"Flushing Cache Runs\n";
-                flushCacheRuns();
-          }
-            if(_SSDRuns.size()>0){
-            // std::cout<<"Flushing SSD Runs\n";
-                flushSSDRuns();
-          }
+    // else{
+    //       if(_cacheOfRuns.size()>0){
+    //         // std::cout<<"Flushing Cache Runs\n";
+    //             flushCacheRuns();
+    //       }
+    //         if(_SSDRuns.size()>0){
+    //         // std::cout<<"Flushing SSD Runs\n";
+    //             flushSSDRuns();
+    //       }
     int _count = _HDDRuns.size();
     while(_count > _fanOutSSD) {
         int _storeIdx = 0;
@@ -205,7 +218,6 @@ void MultiStageLoserTree::reduce() {
         _HDDRuns.erase(_HDDRuns.begin() + _storeIdx, _HDDRuns.end());
     } 
     _tree = new LoserTree(_HDDRuns, _HDDRuns.size());
-    }
 }
 
 void MultiStageLoserTree::flushCacheRuns(){
