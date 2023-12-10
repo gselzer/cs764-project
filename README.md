@@ -59,7 +59,39 @@ The work for this project was largely driven by the desire to enable a 120 GB so
 
 The project state is mostly complete. We know that we can run three of the four "graded" sort operations. The largest sort operation (`120GB`), throws a segmentation fault when approximately 80GB of data is spilled to the HDD.
 
-We also are aware that running `./sort` on the CSL instructional machines causes our `VerifyOrderIterator` to throw an `AssertionError` around a sort size of approximately 8GB - we know that `./sort -c 7900000 -s 1000 -o task.txt` and all tested sort sized below pass our iterators but `./sort -c 7950000 -s 1000 -o task.txt` and all tested sort sizes above throw the assertion error with a segmentation fault. Because the code path does not change at this sort size, **and because we can sort 12GB on our linux and macOS machines successfully**, we believe this may be a limitation imposed by the machines on students' operations within the CSL machines. If you encounter this error while grading our project, please let us know and we'd be happy to work around it.
+We also are aware that running `./sort` on the CSL instructional machines causes our `VerifyOrderIterator` to throw an `AssertionError` around a sort size of approximately 8GB - we know that `./sort -c 7900000 -s 1000 -o task.txt` and all tested sort sized below pass our iterators but `./sort -c 7950000 -s 1000 -o task.txt` and all tested sort sizes above throw the assertion error with a segmentation fault. Because the code path does not change at this sort size, **and because we can sort 12GB on our linux (Multiple Distributions) and macOS machines successfully**, we believe this may be a limitation imposed by the machines on students' operations within the CSL machines. If you encounter this error while grading our project, please let us know and we'd be happy to work around it.
+
+In Adition we tried to debug this issue on CSL machines and found out that our program tries to write out multiple data records to file but is only able to write a few of the records. We believe this could be due to a Rate Limit on File I/O on the CSL machines.
+
+Here is the last lines of output on CSL machine with our Debug Statements :
+
+```bash
+Write was fine!
+Write was fine!
+Write was fine!
+Write was fine!
+Tried to write out 1048 elements, but wrote out (w1) 387 instead (Faiure 1)
+Tried to write out 1006080 elements, but wrote out (w2) 4096 instead (Failure 2)
+Tried to write out 1048 elements, but wrote out (w1) 102 instead (Faiure 3)
+Tried to write out 1006080 elements, but wrote out (w2) 4096 instead (Failure 4)
+Tried to write out 1048 elements, but wrote out (w1) 102 instead (Faiure 5)
+Tried to write out 1006080 elements, but wrote out (w2) 4096 instead (Failure 6)
+Tried to write out 1048 elements, but wrote out (w1) 102 instead (Faiure 7)
+Tried to write out 1006080 elements, but wrote out (w2) 4096 instead (Failure 8)
+Tried to write out 1048 elements, but wrote out (w1) 102 instead (Faiure 9)
+Tried to write out 1006080 elements, but wrote out (w2) 4096 instead (Failure 10)
+Tried to write out 1048 elements, but wrote out (w1) 102 instead (Faiure 11)
+Tried to write out 1006080 elements, but wrote out (w2) 4096 instead (Failure 12)
+Tried to write out 1048 elements, but wrote out (w1) 102 instead (Faiure 13)
+Tried to write out 1006080 elements, but wrote out (w2) 4096 instead (Failure 14)
+Tried to write out 1048 elements, but wrote out (w1) 102 instead (Faiure 15)
+Tried to write out 1006080 elements, but wrote out (w2) 4096 instead (Failure 16)
+...
+sort: src/VerifyOrder.cpp:52: virtual Record* VerifyOrderIterator::next(): Assertion `*_last <= *r' failed.
+Aborted (core dumped)
+```
+
+In contrast we faced no issues as such on our local and test machines (Unix System (Mac OS), Fedora (Linux), Kali(Linux) and Ubuntu(Linux)). 
 
 Running the program can be accomplished using the syntax requested in the assignment description:
 
