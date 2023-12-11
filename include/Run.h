@@ -2,6 +2,8 @@
 #include "defs.h"
 #include "Record.h"
 
+// Keeps track of SSD and HDD occupancy.
+// Also responsible for calculating total SSD/HDD transfer time
 class RunStorageState
 {
 	public:
@@ -23,6 +25,7 @@ class RunStorageState
     float _hddTime;
 }; // class RunStorageState
 
+// Base Run class
 class Run {
 public:
     virtual ~Run() {};
@@ -31,6 +34,8 @@ public:
     virtual Record* pop() = 0;
 }; // class Run
 
+// Run implementation used to fill out LoserTree data structure to 2^n Runs
+// Always returns nullptrs
 class EmptyRun: public Run{ 
 public:
     void push(Record *);
@@ -38,6 +43,7 @@ public:
     Record* pop();
 }; // class EmptyRun
 
+// Run implementation actually containing runs
 class DynamicRun: public Run {
 public:
     DynamicRun(RunStorageState * state, size_t pageSize, size_t recordSize);

@@ -10,17 +10,17 @@ LoserTree::LoserTree(std::vector<DynamicRun*>cacheOfRuns, int runCount){
     // Set up runs array (array of Run pointers)
     _runCount = runCount;
         
+    // Increase run count to next highest power of 2
     while(!IsPowerOf2(_runCount)) {
         _runCount++;
     }
-    //    std::cout << "Run Count: " << _runCount << "\n";
+    // Allocate run array
     _runs = (Run **) malloc(_runCount * sizeof(Run *));
-    // std::memcpy(_runs, runs, runCount * sizeof(Run *));
+    // Fill in the beginning of the run array with the actual runs
     for(int i =0;i<runCount;i++){
         _runs[i] = cacheOfRuns[i];
-        
     }
-    
+    // Pad the remainder with empty runs
     for(int i = runCount; i < _runCount; i++) {
         // std::cout << "Run Count: " << _runCount << "\n";
         _runs[i] = new EmptyRun();
@@ -90,6 +90,7 @@ void LoserTree::replayGame(int idx, int prevWinner) {
     replayGame(idx / 2, winner);
 }
 
+// Constructs the initial Tree of Losers structure
 void LoserTree::buildTree() {
     int* _tmp = (int*) malloc(_runCount * sizeof(int));
     for(int i = 0; i < _runCount; i++) {
@@ -123,6 +124,7 @@ void LoserTree::buildTree() {
     free(_tmp);
 }
 
+// Convenience function to print the tree
 void LoserTree::printTree(){ 
     // Idx 0 is the "overall winner",
     // Idx 1 is the "root node" of the tree,
@@ -145,33 +147,40 @@ MultiStageLoserTree::~MultiStageLoserTree() {
 }
 
 Record *MultiStageLoserTree::next() {
-    // return _fileBackedRuns[0]->pop();
     return _tree->next();
 }
 
+// Adds run into the MultiStageLoserTree structure
 void MultiStageLoserTree::append(DynamicRun *run ) {
+    // Add the run into the structure
     _cacheOfRuns.push_back(run);
+    // If DRAM is full, flush all runs in DRAM to ssd
     if(_cacheOfRuns.size()>_fanOutSSD){
         flushCacheRuns();
     }    
 }
 
+// Reduces down to a single LoserTree containing all data
 void MultiStageLoserTree::reduce() {
+    // Shortcut - if we only have data in DRAM, just build a LoserTree on that
     if(_cacheOfRuns.size()<_fanOutSSD && _SSDRuns.size()==0 && _HDDRuns.size()==0){
         std::cout<<"As Number of Records are low so no need to Spill to Disk\n";
         _tree = new LoserTree(_cacheOfRuns, _cacheOfRuns.size());
         
     }
-    
+    // Otherwise:
     else{
+        // Flush Runs in DRAM to SSD
           if(_cacheOfRuns.size()>0){
             // std::cout<<"Flushing Cache Runs\n";
                 flushCacheRuns();
           }
+          // Flush Runs on SSD to HDD
             if(_SSDRuns.size()>0){
             // std::cout<<"Flushing SSD Runs\n";
                 flushSSDRuns();
           }
+    // Then - reduce down HDD runs to fit within a single Tree of Losers
     int _count = _HDDRuns.size();
     while(_count > _fanOutSSD) {
         int _storeIdx = 0;
@@ -208,6 +217,7 @@ void MultiStageLoserTree::reduce() {
     }
 }
 
+// Flushes all runs in DRAM to SSD
 void MultiStageLoserTree::flushCacheRuns(){
     LoserTree *tree = new LoserTree(_cacheOfRuns, _cacheOfRuns.size());
     // Read out the sorted results to a file-backed run
@@ -221,6 +231,7 @@ void MultiStageLoserTree::flushCacheRuns(){
     //store the FileBackedRun in the Vector
     run->harden();
     _SSDRuns.push_back(run);
+    // If we now have a full SSD, flush to HDD
      if(_SSDRuns.size()>_fanOutHDD){
         flushSSDRuns();
     }    
@@ -230,6 +241,7 @@ void MultiStageLoserTree::flushCacheRuns(){
     delete tree;
 }
 
+// Flushes all runs on SSD to HDD
 void MultiStageLoserTree::flushSSDRuns(){
     LoserTree *tree = new LoserTree(_SSDRuns, _SSDRuns.size());
     // Read out the sorted results to a file-backed run

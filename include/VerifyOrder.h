@@ -3,6 +3,7 @@
 # include "Record.h"
 #include <vector>
 
+// Plan responsible for verifying the sorted order of a stream of Records
 class VerifyOrderPlan : public Plan
 {
 	friend class VerifyOrderIterator;
@@ -15,6 +16,7 @@ private:
 	size_t recordSize;
 }; // class VerifyOrderPlan
 
+// Iterator responsible for verifying the sorted order of a stream of Records
 class VerifyOrderIterator : public Iterator
 {
 public:

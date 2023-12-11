@@ -5,6 +5,7 @@
 #include "Run.h"
 #include <vector>
 
+// Plan responsible for computing an external merge sort
 class ExternalMergeSortPlan : public Plan
 {
 	friend class ExternalMergeSortIterator;
@@ -16,6 +17,7 @@ private:
 	Plan * _input;
 }; // class ExternalMergeSortPlan
 
+// Iterator responsible for computing an external merge sort
 class ExternalMergeSortIterator : public Iterator
 {
 public:

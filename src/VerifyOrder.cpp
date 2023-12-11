@@ -39,6 +39,7 @@ VerifyOrderIterator::~VerifyOrderIterator ()
 	delete _last;
 } // VerifyOrderIterator::~VerifyOrderIterator
 
+// Return the previous iterator's record, asserting it is greater than or equal to the previous record it returned.
 Record* VerifyOrderIterator::next ()
 {
     TRACE (false);

@@ -25,7 +25,7 @@ RunStorageState::~RunStorageState() {
     std::cout << "Total HDD latency + transfer time: " << _hddTime << "\n"; 
 }
 
-// Returns true iff "written to SSD"
+// Records the time taken for a write to a device
 void RunStorageState::write(const uint64_t noBytes, const int _pageSize) {
    
     if (_pageSize == _ssd_page_size ) {
@@ -52,6 +52,7 @@ void RunStorageState::write(const uint64_t noBytes, const int _pageSize) {
     }
 }
 
+// Records the time taken for a read to a device
 void RunStorageState::read(const uint64_t noBytes, const int pageSize) {
     if (pageSize == _ssd_page_size) {
         // Write out to SSD
@@ -103,6 +104,7 @@ DynamicRun::~DynamicRun() {
     
 }
 
+// Pushes a record onto the end of the run, writing the buffer out to a file if necessary
 void DynamicRun::push(Record *r) {
     if (_produce_idx % maxRecords == 0 && _produce_idx != 0) {
         if (file == nullptr) {
@@ -148,6 +150,8 @@ void DynamicRun::push(Record *r) {
     
 }
 
+// Peeks at the next Record in the Run, but does not remove it
+// Reads new Records in from file if necessary
 Record* DynamicRun::peek() {
     if (_consume_idx < _produce_idx) {
         if (readRemaining == 0) {
@@ -160,6 +164,8 @@ Record* DynamicRun::peek() {
     return nullptr;
 }
 
+// Removes and returns the next record in the run, reading new Records in
+// from file if necessary
 Record *DynamicRun::pop() {
     if (_consume_idx < _produce_idx) {
         if (readRemaining == 0) {
@@ -179,6 +185,8 @@ Record *DynamicRun::pop() {
     return nullptr;
 }
 
+// Writes out any unwritten Records to File, and resets the file pointer.
+// 
 // This function should be called once all Records that this Run should store
 // have been pushed, and we are ready to start popping records. Before this
 // function is called, Records should not be popped, and after this function
@@ -207,6 +215,8 @@ void DynamicRun::harden() {
     }
 }
 
+// Sorts the Run
+// Only callable if this run is CPU Cache sized
 void DynamicRun::sort() {
     // std::cout<<"Sorting "<<_produce_idx<<" records\n";
     if (!(_pageSize == CPU_CACHE_SIZE) && _produce_idx <= maxRecords) {

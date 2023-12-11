@@ -1,5 +1,6 @@
 #include "Iterator.h"
 
+// Plan creating a Filter iterator
 class FilterPlan : public Plan
 {
 	friend class FilterIterator;
@@ -11,6 +12,7 @@ private:
 	Plan * const _input;
 }; // class FilterPlan
 
+// An iterator that filters the outputs of the previous iterator
 class FilterIterator : public Iterator
 {
 public:

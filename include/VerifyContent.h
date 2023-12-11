@@ -3,6 +3,7 @@
 # include "Record.h"
 #include <vector>
 
+// Class that holds state used by two paired VerifyContentPlans
 class VerifyContentState
 {
 public:
@@ -17,6 +18,7 @@ private:
 	RowCount _diffSeen;
 }; // class VerifyContentState
 
+// Plan responsible for verifying the content of data before/after sorting
 class VerifyContentPlan : public Plan
 {
 	friend class VerifyContentIterator;
@@ -30,6 +32,7 @@ private:
 	const bool _isProducer;
 }; // class VerifyContentPlan
 
+// Iterator responsible for verifying the content of data before/after sorting
 class VerifyContentIterator : public Iterator
 {
 public:

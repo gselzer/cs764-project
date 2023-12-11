@@ -16,23 +16,22 @@
 #include <fstream>
 
 void sort(RowCount numRecords, size_t recordSize) {
-    // std::cout << "Running SortIterator tests...\n";
-    
-    // Manually creating some records for testing
-    // std::cout << "Sorting " << numRecords << " records (" << numRecords * recordSize << " bytes)...\n";
-
-    // Assuming SortPlan takes another Plan as input
-    ScanPlan scanPlan(numRecords, recordSize);  // Just a placeholder; replace with your actual input plan
+    // First, scan
+    ScanPlan scanPlan(numRecords, recordSize);
+    // Keep track of all records entering the sort
     VerifyContentState *state = new VerifyContentState(recordSize);
     VerifyContentPlan verifyProducerPlan(&scanPlan, state, true);
+    // Sort all of the scanned records
     ExternalMergeSortPlan sortPlan(&verifyProducerPlan);
+    // Assert that all records leaving the scan are in order
     VerifyOrderPlan validPlan(&sortPlan, recordSize);
+    // Assert that we didn't lose any records over the course of the scan
     VerifyContentPlan verifyConsumerPlan(&validPlan, state, false);
 
     // Initialize SortIterator
     Iterator* sortIt = verifyConsumerPlan.init();
     
-    // std::cout << "Getting next element\n";
+    // Sort records
     int i = 0;
     while (true) {
         Record* record = sortIt->next();
@@ -55,6 +54,7 @@ int main(int argc, char *argv[]) {
     size_t recordSize = 0;
     std::string traceFile;
 
+    // Parse arguments
     int option;
     while ((option = getopt(argc, argv, "c:s:o:")) != -1) {
         switch (option) {

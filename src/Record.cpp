@@ -3,8 +3,10 @@
 #include <cstring>
 #include <ostream>
 
+// Default constructor
 Record::Record() {}
 
+// Constructor copying the data of another Record
 Record::Record(Record &other) {
 	try {
 		columnSize = other.columnSize;
@@ -27,7 +29,7 @@ Record::Record(Record &other) {
     }
 }
 
-// Constructor
+// Constructor designed to fill a specific size
 Record::Record(int s) : _offset(-1), _value(-1) {
 	// Divide remaining size by 3
 	// TODO - don't lose remainder!
@@ -50,7 +52,7 @@ Record::Record(int s) : _offset(-1), _value(-1) {
     TRACE(false);
 }
 
-// Constructorc
+// Constructor wrapping existing columns
 Record::Record(char *col1, char *col2, char *col3, int s) : col1(col1), col2(col2), col3(col3), _offset(-1), _value(-1) {
 	// Divide remaining size by 3
 	// TODO - don't lose remainder!
@@ -139,13 +141,15 @@ std::ostream& operator<<(std::ostream& os, Record const &r) {
 }
 
 void Record::encodeOVC(Record *other) {
+	// Assume that other < this
 	try {
-		// Assume that other < this
+		// Sentinel value used to indicate first Record in a run
 		if (other == nullptr) {
 			_offset = 0;
 			_value = 0;
 			return;
 		}
+		// Check first column
 		for (int i = 0; i < columnSize; i++){
 			if (other->col1[i] < col1[i]) {
 				_offset = i + 1;
@@ -153,6 +157,7 @@ void Record::encodeOVC(Record *other) {
 				return;
 			}
 		}
+		// Check second column
 		for (int i = 0; i < columnSize; i++){
 			if (other->col2[i] < col2[i]) {
 				_offset = columnSize + i + 1;
@@ -160,6 +165,7 @@ void Record::encodeOVC(Record *other) {
 				return;
 			}
 		}
+		// Check third column
 		for (int i = 0; i < columnSize; i++){
 			if (other->col3[i] < col3[i]) {
 				_offset = columnSize + columnSize + i + 1;
@@ -178,15 +184,19 @@ void Record::encodeOVC(Record *other) {
 
 bool Record::leOVC(Record *other) {
 	try {
+		// If either OVC is a sentinel, we have to check the whole thing
 		if(other->_offset == 0 && other->_value == 0 || _offset == 0 && _value == 0) {
 			return *this <= *other;
 		}
+		// Check offset
 		if (_offset != other->_offset) {
 			return _offset > other->_offset;
 		}
+		// Check value
 		if (_value != other->_value) {
 			return _value < other->_value;
 		}
+		// Check acutal equality
 		return *this <= *other;
 	} catch (const std::exception& e) {
         std::cerr << "Exception occurred in Record leOVC(): " << e.what() << std::endl;

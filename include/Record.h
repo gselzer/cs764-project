@@ -2,6 +2,8 @@
 #include "defs.h"
 #include <ostream>
 #pragma once
+
+// Base record data class
 class Record {
 public:
     Record();

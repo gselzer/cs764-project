@@ -4,6 +4,10 @@
 #include<limits>
 #include<iostream>
 
+// Keeps track of all records seen
+// Note that we use an XOR function to check content before and after in an efficient manner,
+// as there is a nearly impossible chance for us to see different records before and after
+// and for the xor to be zero.
 VerifyContentState::VerifyContentState(size_t const recordSize) : _diffSeen(0)
 {
 	_diff = new Record(recordSize);
@@ -24,22 +28,29 @@ VerifyContentState::~VerifyContentState()
 	delete _noDiff;
 }
 
+// XOR the record as it enters
 void VerifyContentState::incrementDiff(Record *r) {
 	*_diff ^= *r;
 	_diffSeen++;
 }
 
+// XOR the record as it leaves
 void VerifyContentState::decrementDiff(Record *r) {
 	*_diff ^= *r;
 	_diffSeen--;
 }
 
+// Assert that all records that entered have also left
 bool VerifyContentState::allSeen() {
 	bool allSeen = *_diff == *_noDiff && _diffSeen == 0;
 	return allSeen;
 }
 
-
+// The plan works either as a producer or as a consumer
+// Producer plans increment the xor difference as they see records.
+// Consumer plans decrement the xor difference as they see records.
+// Consumer plans are also responsible for asserting that all records
+// it saw were also seen by the producer when it is destroyed.
 VerifyContentPlan::VerifyContentPlan (Plan *const input, VerifyContentState *const state, bool isProducer) : _input (input), _state (state), _isProducer(isProducer)
 {
 } // VerifyContentPlan::VerifyContentPlan
@@ -88,6 +99,7 @@ Record* VerifyContentIterator::next ()
 	if (r != nullptr) {
 		_consumed++;
 		_produced++;
+		// Change the diff, depending on whether this Iterator is a producer or consumer.
 		if (_isProducer)
 			_plan->_state->incrementDiff(r);
 		else

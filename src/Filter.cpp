@@ -2,6 +2,7 @@
 
 #include<cstdlib>
 
+// NB We didn't implement any extra credit here, and don't call any of this in the sort
 FilterPlan::FilterPlan (Plan * const input) : _input (input)
 {
 	TRACE (true);

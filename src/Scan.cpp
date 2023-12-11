@@ -37,6 +37,7 @@ ScanIterator::~ScanIterator ()
 			(unsigned long) (_plan->_count));
 } // ScanIterator::~ScanIterator
 
+// Generates a new random record
 Record* ScanIterator::next ()
 {
     TRACE (false);
