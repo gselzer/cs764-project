@@ -63,6 +63,7 @@ private:
     RunStorageState *_state;
     Record *_last;
     Record *_lastSSD;
+    int _no_failures=0;
 }; // class DynamicRun
 
 // Stale classes, kept for historical reasons.

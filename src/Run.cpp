@@ -108,8 +108,18 @@ void DynamicRun::push(Record *r) {
         if (file == nullptr) {
             file = std::tmpfile();
         }
-        std::fwrite(_records, sizeof(Record), maxRecords, file);
-        std::fwrite(_rows, sizeof(char), 3 * maxRecords * colSize, file);
+        size_t w1 = std::fwrite(_records, sizeof(Record), maxRecords, file);
+        if (w1 == maxRecords) {
+            //    std::cerr << "Write was fine!\n";
+        } else {
+            std::cerr << "Tried to write out " << 3 * maxRecords * colSize << " elements, but wrote out (w2) " << w1 << " instead (Failure " << ++_no_failures << ")\n";
+        }
+        size_t w2 = std::fwrite(_rows, sizeof(char), 3 * maxRecords * colSize, file);
+        if (w2 == 3 * maxRecords * colSize) {
+            //    std::cerr << "Write was fine!\n";
+        } else {
+            std::cerr << "Tried to write out " << 3 * maxRecords * colSize << " elements, but wrote out (w2) " << w2 << " instead (Failure " << ++_no_failures << ")\n";
+        }
         // std::cout << "Writing out " << maxRecords << " Records to file\n";
     }
     if(r == nullptr) {
