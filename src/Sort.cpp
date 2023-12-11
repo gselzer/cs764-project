@@ -15,21 +15,21 @@ Iterator* ExternalMergeSortPlan::init() const {
     return new ExternalMergeSortIterator(this);
 }
 
-ExternalMergeSortIterator::ExternalMergeSortIterator(const ExternalMergeSortPlan* plan) 
-    : _plan(plan), 
-      _input(_plan->_input->init()),  
-      _currentIdx(0)
+ExternalMergeSortIterator::ExternalMergeSortIterator(const ExternalMergeSortPlan* plan)
+    : _plan(plan),
+    _input(_plan->_input->init()),
+    _currentIdx(0)
 {
     // Step 1: Create Runs
     std::vector<Run*> records;
-    Record *r;
+    Record* r;
     r = _input->next();
 
     _state = new RunStorageState();
     _tree = new MultiStageLoserTree(_state, r->size());
 }
 
-    #include <algorithm>
+#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <vector>
@@ -61,7 +61,7 @@ void sortSsdAndStore(uint64_t totalDataSize, uint64_t ssdOffset, bool isDramSort
 }
 
 // Sort the data in HDD and store the sorted data back onto the HDD
-void sortHddAndStore(uint64_t totalDataSize, uint64_t hddOffset) {
+void sortHddAndStore(uint64_t totalDataSize, uint64_t hddOffset, const std::string& outputHdd) {
     // Read the data into memory
     std::vector<char> data(totalDataSize);
     readDataFromHDD(hddOffset, data);
@@ -100,54 +100,97 @@ void writeDataToHDD(uint64_t offset, const std::vector<char>& data, const std::s
     output.write(data.data(), data.size());
     output.close();
 }
-    
-    // Get the total data size
-    uint64_t totalDataSize = 0; 
-    while (r != nullptr) {
-        totalDataSize += r->size();
-        r = _input->next();
-    }
 
-
-    // Define the limits for DRAM and SSD
-    const uint64_t dramLimit = CACHE_SIZE;
-    const uint64_t ssdLimit = 0.95 * CACHE_SIZE / (CPU_CACHE_SIZE);
-
-    // Perform sorting and storage based on the total data size
-    if (totalDataSize < dramLimit) {
-        // Case 1: Unsorted HDD -> DRAM -> HDD Sorted
-        sortDramAndStore(totalDataSize, 0, false, "result/test_HDD.txt");
-    } else if (totalDataSize < ssdLimit) {
-        // Case 2: Unsorted HDD -> DRAM -> SSD Sorted, Sorted DRAM + Sorted SSD -> HDD Sorted
-        sortSsdAndStore(totalDataSize, 0, false, "result/test_HDD.txt");
-    } else {
-        // Case 3: Unsorted HDD -> DRAM -> SSD Sorted, Sorted DRAM + Sorted SSD -> HDD Sorted, Sorted DRAM + Sorted SSD + Sorted HDD -> HDD Sorted
-        sortHddAndStore(totalDataSize, 0);
-    }
-    
-    
-    while (r != nullptr) {
-        DynamicRun *run = new DynamicRun(_state,CPU_CACHE_SIZE,r->columnSize);
-        // Fill in the run array
-        for (uint64_t i = 0; i < run->maxRecords; i++) {
-            run->push(r);
-            r = _input->next();
+// Merge the sorted runs and store the merged data back onto the HDD
+void mergeAndStoreRuns(const std::vector<Run*>& runs, const std::string& outputHdd) {
+    std::vector<Record*> mergedRecords;
+    for (Run* run : runs) {
+        Record* record = run->next();
+        while (record != nullptr) {
+            mergedRecords.push_back(record);
+            record = run->next();
         }
-        run->sort();
-        run->readRemaining = run->maxRecords;
-        _tree->append(run);
-    } 
-    _tree->reduce();
-    
+    }
 
+    // Sort the merged records
+    std::sort(mergedRecords.begin(), mergedRecords.end(), [](const Record* a, const Record* b) {
+        // Implement your own comparison function here
+        // return a->value < b->value;
+    });
 
-ExternalMergeSortIterator::~ExternalMergeSortIterator() {
-    TRACE(false);
-    delete _input;
-    delete _state;
-    delete _tree;
-}
+    // Store the sorted merged data back onto the HDDTo implement graceful degradation into the merge process, we can modify the `ExternalMergeSortIterator` class as follows:
 
-Record* ExternalMergeSortIterator::next() {
-    return _tree->next();
+```cpp
+ExternalMergeSortIterator::ExternalMergeSortIterator(const ExternalMergeSortPlan* plan)
+    : _plan(plan),
+    _input(_plan->_input->init()),
+    _currentIdx(0),
+    _state(nullptr),
+    _tree(nullptr)
+{
+    // Step 1: Create Runs
+    std::vector<Run*> runs;
+    Record* record = nullptr;
+    uint64_t totalDataSize = 0;
+    uint64_t dramOffset = 0;
+    uint64_t ssdOffset = 0;
+    uint64_t hddOffset = 0;
+    bool isDramSorted = false;
+    bool isSsdSorted = false;
+
+    while ((record = _input->next()) != nullptr) {
+        totalDataSize += record->size();
+
+        // Check if the data can fit in DRAM
+        if (totalDataSize <= dramLimit) {
+            _dramRecords.push_back(record);
+        }
+        // Check if the data can fit in SSD
+        else if (totalDataSize <= ssdLimit) {
+            _ssdRecords.push_back(record);
+        }
+        else {
+            // The data exceeds the available memory capacity
+            // Sort and store the records in the appropriate storage medium
+            if (!_dramRecords.empty()) {
+                // Sort and store the records in DRAM
+                sortDramAndStore(totalDataSize - record->size(), dramOffset, isSsdSorted, outputHdd);
+                dramOffset += _dramRecords.size() * record->size();
+                isDramSorted = true;
+                runs.push_back(new InMemoryRun(_dramRecords));
+                _dramRecords.clear();
+            }
+            else if (!_ssdRecords.empty()) {
+                // Sort and store the records in SSD
+                sortSsdAndStore(totalDataSize - record->size(), ssdOffset, isDramSorted, outputHdd);
+                ssdOffset += _ssdRecords.size() * record->size();
+                isSsdSorted = true;
+                runs.push_back(new InMemoryRun(_ssdRecords));
+                _ssdRecords.clear();
+            }
+
+            // Create a new HDD run for the current record
+            runs.push_back(new HDDRun(record, hddOffset));
+            hddOffset += record->size();
+        }
+    }
+
+    // Sort and store any remaining records in the appropriate storage medium
+    if (!_dramRecords.empty()) {
+        sortDramAndStore(totalDataSize, dramOffset, isSsdSorted, outputHdd);
+        runs.push_back(new InMemoryRun(_dramRecords));
+        _dramRecords.clear();
+    }
+    else if (!_ssdRecords.empty()) {
+        sortSsdAndStore(totalDataSize, ssdOffset, isDramSorted, outputHdd);
+        runs.push_back(new InMemoryRun(_ssdRecords));
+        _ssdRecords.clear();
+    }
+
+    // Merge the runs
+    mergeAndStoreRuns(runs, outputHdd);
+
+    // Initialize the state and tree
+    _state = new RunStorageState();
+    _tree = new MultiStageLoserTree(_state, runs.size());
 }
